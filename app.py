@@ -158,25 +158,24 @@ if st.button("تحليل الرسالة", use_container_width=True):
             for reason in reasons:
                 st.write(f"- {reason}")
 
+          
             try:
                 with open("warning.mp3", "rb") as audio_file:
                     audio_bytes = audio_file.read()
 
                 audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
 
-components.html(
-    f"""
-    <audio autoplay>
-        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mpeg">
-    </audio>
-    """,
-    height=0
-)
+                components.html(
+                    f"""
+                    <audio autoplay>
+                        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mpeg">
+                    </audio>
+                    """,
+                    height=0
+                )
 
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
-
-            st.write("تواصل مع الجهة الرسمية للتأكد.")
 
         else:
             st.success("✅ لا توجد مؤشرات كافية على الاحتيال.")
