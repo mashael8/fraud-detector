@@ -1,7 +1,3 @@
-```text
 streamlit
-pandas
-numpy
-scikit-learn
-joblib
-```
+SpeechRecognition
+audio-recorder-streamlit
