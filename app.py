@@ -4,6 +4,7 @@ import streamlit.components.v1 as components
 from audio_recorder_streamlit import audio_recorder
 import speech_recognition as sr
 import io
+import base64
 
 # إعدادات الصفحة
 st.set_page_config(page_title="أمان", page_icon="🛡️", layout="centered")
@@ -161,7 +162,16 @@ if st.button("تحليل الرسالة", use_container_width=True):
                 with open("warning.mp3", "rb") as audio_file:
                     audio_bytes = audio_file.read()
 
-                st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+                audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+
+components.html(
+    f"""
+    <audio autoplay>
+        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mpeg">
+    </audio>
+    """,
+    height=0
+)
 
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
