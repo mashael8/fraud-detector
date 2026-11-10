@@ -131,34 +131,41 @@ if st.button("تحليل الرسالة", use_container_width=True):
 
         # إعطاء النتيجة
         if score >= 6:
-            st.error("🚨 **احترس! هذه الرسالة احتيال بشكل مؤكد.**")
-            st.write("**الأسباب:**")
-            for r in reasons: st.write(f"- {r}")
-            st.write("**نصيحة:** لا تضغط على أي روابط، ولا ترسل أي معلومات بنكية أو رمز تحقق (OTP).")
-            
-            # تشغيل ملف الصوت
-            try:
-                st.audio("warning.mp3", format="audio/mp3")
-           st.write("**نصيحة:** تواصل مع الجهة المرسلة عبر رقمها الرسمي للتأكد.")
-            
-            # تشغيل ملف الصوت
-            try:
-                st.audio("warning.mp3", format="audio/mp3")
-            except:
-                pass
+                    if score >= 6:
+    st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
-        else:
-            st.success("✅ **الرسالة تبدو آمنة.**")
-            st.write("ولكن تذكر دائماً عدم مشاركة معلوماتك الشخصية.")
-            
-        else:
-            st.warning("الرجاء إدخال رسالة أولاً.")
-            except:
-                pass
+    st.markdown(
+        """
+        <div style="
+            background-color:#ffdddd;
+            color:#990000;
+            padding:20px;
+            border-radius:12px;
+            text-align:center;
+            font-size:24px;
+            font-weight:bold;
+            border:3px solid red;
+        ">
+            🚨 إنذار أمان 🚨<br>
+            احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-        else:
-            st.success("✅ **الرسالة تبدو آمنة.**")
-            st.write("ولكن تذكر دائماً عدم مشاركة معلوماتك الشخصية.")
-    else:
-        st.warning("الرجاء إدخال رسالة أولاً.")
+    st.write("**أسباب التحذير:**")
+    for reason in reasons:
+        st.write(f"- {reason}")
+
+    # تشغيل صوت الإنذار
+    try:
+        with open("warning.mp3", "rb") as audio_file:
+            audio_bytes = audio_file.read()
+
+        st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+
+    except FileNotFoundError:
+        st.warning("ملف الإنذار warning.mp3 غير موجود.")
+
+    st.write("تواصل مع الجهة الرسمية للتأكد.")
 
