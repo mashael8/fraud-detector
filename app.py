@@ -131,7 +131,7 @@ if st.button("تحليل الرسالة", use_container_width=True):
 
         # إعطاء النتيجة
         if score >= 6:
-                    if score >= 6:
+            if score >= 6:
     st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
     st.markdown(
