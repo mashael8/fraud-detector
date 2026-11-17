@@ -71,34 +71,69 @@ hide_streamlit_style = """
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
-# ===== تسجيل الدخول التجريبي =====
+# ===== نظام الدخول التجريبي =====
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
+if "show_signup" not in st.session_state:
+    st.session_state.show_signup = False
+
+if "users" not in st.session_state:
+    st.session_state.users = {}
+
 if not st.session_state.logged_in:
 
-    st.title("🛡️ تسجيل الدخول إلى أمان")
-    st.write("مرحباً بك، سجّل الدخول للمتابعة")
+    if st.session_state.show_signup:
 
-    email = st.text_input("البريد الإلكتروني")
-    password = st.text_input("كلمة المرور", type="password")
+        st.title("🛡️ إنشاء حساب جديد")
+        st.write("أنشئ حسابك للانضمام إلى أمان")
 
-    if st.button("تسجيل الدخول"):
-        if email and password:
-            st.session_state.logged_in = True
+        new_email = st.text_input("البريد الإلكتروني الجديد")
+        new_password = st.text_input("كلمة المرور الجديدة", type="password")
+        confirm_password = st.text_input("تأكيد كلمة المرور", type="password")
+
+        if st.button("إنشاء الحساب"):
+            if not new_email or not new_password or not confirm_password:
+                st.warning("الرجاء تعبئة جميع الحقول")
+            elif new_password != confirm_password:
+                st.error("كلمتا المرور غير متطابقتين")
+            elif new_email in st.session_state.users:
+                st.error("هذا البريد مسجل مسبقاً")
+            else:
+                st.session_state.users[new_email] = new_password
+                st.success("تم إنشاء الحساب تجريبياً!")
+                st.session_state.show_signup = False
+                st.rerun()
+
+        if st.button("العودة إلى تسجيل الدخول"):
+            st.session_state.show_signup = False
             st.rerun()
-        else:
-            st.warning("الرجاء إدخال البريد الإلكتروني وكلمة المرور")
 
-    st.write("ليس لديك حساب؟")
+    else:
 
-    if st.button("إنشاء حساب"):
-        st.info("سيتم تجهيز صفحة إنشاء الحساب في الخطوة القادمة.")
+        st.title("🛡️ تسجيل الدخول إلى أمان")
+        st.write("مرحباً بك، سجّل الدخول للمتابعة")
+
+        email = st.text_input("البريد الإلكتروني")
+        password = st.text_input("كلمة المرور", type="password")
+
+        if st.button("تسجيل الدخول"):
+            if email in st.session_state.users and st.session_state.users[email] == password:
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("البريد الإلكتروني أو كلمة المرور غير صحيحة")
+
+        st.write("ليس لديك حساب؟")
+
+        if st.button("إنشاء حساب"):
+            st.session_state.show_signup = True
+            st.rerun()
 
     st.stop()
 
-# ===== نهاية تسجيل الدخول =====
+# ===== نهاية نظام الدخول =====
 if st.session_state.logged_in:
     if st.sidebar.button("تسجيل الخروج"):
         st.session_state.logged_in = False
