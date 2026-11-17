@@ -234,19 +234,14 @@ with logo_col2:
             st.session_state.show_signup = False
             st.rerun()
 
+    
     else:
         st.title("تسجيل الدخول إلى أمان")
         st.write("مرحباً بك، سجّل الدخول للمتابعة")
 
         email = st.text_input("البريد الإلكتروني")
+
         show_password = st.checkbox("إظهار كلمة المرور")
-
-password = st.text_input(
-    "كلمة المرور",
-    type="default" if show_password else "password"
-)
-
-                show_password = st.checkbox("إظهار كلمة المرور")
 
         password = st.text_input(
             "كلمة المرور",
