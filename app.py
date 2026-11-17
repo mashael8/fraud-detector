@@ -396,7 +396,7 @@ with tab1:
     </div>
     """,
     unsafe_allow_html=True
-)
+
             )
 
             st.write("**أسباب التحذير:**")
