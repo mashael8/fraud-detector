@@ -153,7 +153,10 @@ if st.session_state.logged_in:
         st.rerun()
                 
 # عرض اللوجو
-st.image("logo.png", width=200)
+logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
+
+with logo_col2:
+    st.image("logo.png", width=150)
 
 # التبويبات
 tab1 = st.container()
