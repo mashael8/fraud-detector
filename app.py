@@ -171,6 +171,7 @@ with tab1:
 
 
        
+            
             # فحص الروابط
             urls = re.findall(
                 r'(https?://[^\s]+|www\.[^\s]+)',
@@ -198,7 +199,11 @@ with tab1:
                     ".xyz", ".top", ".click", ".work"
                 ]
 
-                if any(ext in url.lower() for ext in suspicious_extensions):
+                if any(
+                    ext in item.lower()
+                    for item in urls
+                    for ext in suspicious_extensions
+                ):
                     score += 2
                     reasons.append("وجود نطاق يستحق التحقق منه")
 
