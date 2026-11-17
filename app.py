@@ -158,6 +158,13 @@ if not st.session_state.logged_in:
     margin: 0 auto !important;
 }
 
+/* تنسيق عنوان تسجيل الدخول */
+.stApp h1 {
+    font-size: 36px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    margin-bottom: 25px !important;
+}
         </style>
         """,
         unsafe_allow_html=True
