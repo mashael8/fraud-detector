@@ -7,7 +7,12 @@ import io
 import base64
 
 # إعدادات الصفحة
-st.set_page_config(page_title="أمان", page_icon="🛡️", layout="wide")
+st.set_page_config(
+    page_title="أمان",
+    page_icon="🛡️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # إخفاء شعار Streamlit وتكبير الخط
 # تصميم التطبيق (CSS) - النسخة النهائية
