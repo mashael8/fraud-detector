@@ -189,10 +189,11 @@ if not st.session_state.logged_in:
 
 # ===== نهاية نظام الدخول =====
 
-# زر تسجيل الخروج
-if st.session_state.logged_in:
-    st.sidebar.markdown("### حسابك")
-    if st.sidebar.button("تسجيل الخروج"):
+# زر تسجيل الخروج أعلى الصفحة
+col1, col2 = st.columns([5, 1])
+
+with col2:
+    if st.button("تسجيل الخروج"):
         st.session_state.logged_in = False
         st.session_state.show_signup = False
         st.rerun()
