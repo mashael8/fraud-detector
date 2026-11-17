@@ -246,6 +246,13 @@ password = st.text_input(
     type="default" if show_password else "password"
 )
 
+                show_password = st.checkbox("إظهار كلمة المرور")
+
+        password = st.text_input(
+            "كلمة المرور",
+            type="default" if show_password else "password"
+        )
+
         if st.button("تسجيل الدخول"):
             if email in st.session_state.users and st.session_state.users[email] == password:
                 st.session_state.logged_in = True
