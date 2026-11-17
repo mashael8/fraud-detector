@@ -75,13 +75,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.image("logo.png", width=200)
 
 # التبويبات
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📩 فحص الرسائل",
-    "🔗 فحص الروابط",
-    "🖼️ فحص الصور",
-    "📱 محاكاة SMS",
-    "🛡️ الفحص الشامل"
-])
+tab1 = st.container()
 # عنوان التطبيق
 st.title("تطبيق أمان")
 st.write("أهلاً بك! إما أن تضغط على زر المايك وتتحدث، أو تكتب الرسالة في المربع.")
@@ -111,7 +105,7 @@ with tab1:
     if message_text:
         message = message_text
     # 3. زر التحليل
-    if st.button("تحليل الرسالة", use_container_width=True):
+    if st.button("🛡️ ابدأ الفحص الشامل", use_container_width=True):
         if message:
             score = 0
             reasons = []
