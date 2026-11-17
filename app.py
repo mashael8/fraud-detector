@@ -99,19 +99,19 @@ if "show_signup" not in st.session_state:
 if "users" not in st.session_state:
     st.session_state.users = {}
 
+
 if not st.session_state.logged_in:
     st.image("logo.png", width=130)
 
     if st.session_state.show_signup:
-
-        st.title("🛡️ إنشاء حساب جديد")
+        st.title("إنشاء حساب جديد")
         st.write("أنشئ حسابك للانضمام إلى أمان")
 
         new_email = st.text_input("البريد الإلكتروني الجديد")
         new_password = st.text_input("كلمة المرور الجديدة", type="password")
         confirm_password = st.text_input("تأكيد كلمة المرور", type="password")
 
-                if st.button("إنشاء الحساب"):
+        if st.button("إنشاء الحساب"):
             if not new_email or not new_password or not confirm_password:
                 st.warning("الرجاء تعبئة جميع الحقول")
             elif new_password != confirm_password:
@@ -130,8 +130,7 @@ if not st.session_state.logged_in:
             st.rerun()
 
     else:
-
-        st.title("🛡️ تسجيل الدخول إلى أمان")
+        st.title("تسجيل الدخول إلى أمان")
         st.write("مرحباً بك، سجّل الدخول للمتابعة")
 
         email = st.text_input("البريد الإلكتروني")
