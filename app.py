@@ -209,6 +209,7 @@ with tab1:
                     reasons.append("وجود نطاق يستحق التحقق منه")
 
         
+        
         # إعطاء النتيجة
         if score >= 6:
             st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
@@ -236,7 +237,6 @@ with tab1:
             for reason in reasons:
                 st.write(f"- {reason}")
 
-          
             try:
                 with open("warning.mp3", "rb") as audio_file:
                     audio_bytes = audio_file.read()
@@ -255,7 +255,7 @@ with tab1:
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-                elif score >= 3:
+        elif score >= 3:
             st.warning("⚠️ تنبيه! توجد مؤشرات تستدعي الحذر.")
             st.write("**أسباب التنبيه:**")
             for reason in reasons:
@@ -265,5 +265,6 @@ with tab1:
         else:
             st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
             st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
+
     else:
         st.warning("الرجاء إدخال رسالة أولاً.")
