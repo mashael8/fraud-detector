@@ -113,6 +113,11 @@ html, body, [class*="css"] {
 [data-testid="stImage"] {
     margin-bottom: 20px;
 }
+
+/* ضبط المسافة العلوية للصفحة */
+.block-container {
+    padding-top: 7rem !important;
+}
 </style>
 """
 
