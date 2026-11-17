@@ -204,13 +204,44 @@ with logo_col2:
     st.image("logo.png", width=150)
 
 # التبويبات
-tab1 = st.container()
+tab1 = st.container(border=True)
 # عنوان التطبيق
-st.title("🛡️ أمان – نظام الفحص الشامل")
-st.write("مرحباً بك في أمان. أدخل الرسالة أو الرابط الذي تريد فحصه، وسنساعدك على اكتشاف مؤشرات الاحتيال.")
+st.markdown(
+    """
+    <h1 style="
+        text-align:center;
+        color:#00E0C6;
+        font-size:36px;
+        font-weight:bold;
+        margin-top:20px;
+    ">
+        أمان – نظام الفحص الشامل
+    </h1>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown(
+    """
+    <p style="
+        text-align:center;
+        color:#B8D9F2;
+        font-size:18px;
+        margin-bottom:25px;
+    ">
+        مرحباً بك في أمان. أدخل الرسالة أو الرابط الذي تريد فحصه،
+        وسنساعدك على اكتشاف مؤشرات الاحتيال.
+    </p>
+    """,
+    unsafe_allow_html=True
+)
 
 # 1. زر التسجيل الصوتي
-audio_bytes = audio_recorder(text="اضغط على المايك وتحدث", recording_color="#e83e2a", neutral_color="#ffffff", icon_size="2x")
+audio_bytes = audio_recorder(
+    text="اضغط هنا للتسجيل الصوتي",
+    recording_color="#00E0C6",
+    neutral_color="#00B8D9",
+    icon_size="2x"
+)
 
 message = ""
 
@@ -230,11 +261,16 @@ with tab1:
             message = ""
 
     # 2. خيار الكتابة
-    message_text = st.text_area("أدخل الرسالة أو النص أو الرابط المراد فحصه:", value=message, height=150)
+    message_text = st.text_area(
+    "الرسالة أو الرابط المراد فحصه",
+    value=message,
+    height=200,
+    placeholder="الصق الرسالة أو الرابط هنا للتحقق من سلامته..."
+)
     if message_text:
         message = message_text
     # 3. زر التحليل
-    if st.button("🛡️ ابدأ الفحص الشامل", use_container_width=True):
+    if st.button("ابدأ الفحص الشامل", use_container_width=True):
         if message:
             score = 0
             reasons = []
@@ -343,22 +379,24 @@ with tab1:
             st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
             st.markdown(
-                """
-                <div style="
-                    background-color:#ffdddd;
-                    color:#990000;
-                    padding:20px;
-                    border-radius:12px;
-                    text-align:center;
-                    font-size:24px;
-                    font-weight:bold;
-                    border:3px solid red;
-                ">
-                    🚨 إنذار أمان 🚨<br>
-                    احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
-                </div>
-                """,
-                unsafe_allow_html=True
+    """
+    <div style="
+        background: linear-gradient(135deg, #3B101B, #641B2B);
+        color: #FFFFFF;
+        padding: 22px;
+        border-radius: 16px;
+        text-align: center;
+        font-size: 23px;
+        font-weight: bold;
+        border: 2px solid #FF4D5A;
+        box-shadow: 0 0 18px rgba(255, 77, 90, 0.35);
+    ">
+        🚨 إنذار أمان 🚨<br>
+        احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
             )
 
             st.write("**أسباب التحذير:**")
