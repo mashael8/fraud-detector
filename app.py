@@ -71,6 +71,39 @@ hide_streamlit_style = """
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
+# ===== تسجيل الدخول التجريبي =====
+
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+if not st.session_state.logged_in:
+
+    st.title("🛡️ تسجيل الدخول إلى أمان")
+    st.write("مرحباً بك، سجّل الدخول للمتابعة")
+
+    email = st.text_input("البريد الإلكتروني")
+    password = st.text_input("كلمة المرور", type="password")
+
+    if st.button("تسجيل الدخول"):
+        if email and password:
+            st.session_state.logged_in = True
+            st.rerun()
+        else:
+            st.warning("الرجاء إدخال البريد الإلكتروني وكلمة المرور")
+
+    st.write("ليس لديك حساب؟")
+
+    if st.button("إنشاء حساب"):
+        st.info("سيتم تجهيز صفحة إنشاء الحساب في الخطوة القادمة.")
+
+    st.stop()
+
+# ===== نهاية تسجيل الدخول =====
+if st.session_state.logged_in:
+    if st.sidebar.button("تسجيل الخروج"):
+        st.session_state.logged_in = False
+        st.rerun()
+                
 # عرض اللوجو
 st.image("logo.png", width=200)
 
