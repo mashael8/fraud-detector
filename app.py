@@ -239,7 +239,12 @@ with logo_col2:
         st.write("مرحباً بك، سجّل الدخول للمتابعة")
 
         email = st.text_input("البريد الإلكتروني")
-        password = st.text_input("كلمة المرور", type="password")
+        show_password = st.checkbox("إظهار كلمة المرور")
+
+password = st.text_input(
+    "كلمة المرور",
+    type="default" if show_password else "password"
+)
 
         if st.button("تسجيل الدخول"):
             if email in st.session_state.users and st.session_state.users[email] == password:
