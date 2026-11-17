@@ -112,7 +112,7 @@ if not st.session_state.logged_in:
         confirm_password = st.text_input("تأكيد كلمة المرور", type="password")
 
         if st.button("إنشاء الحساب"):
-            if not new_email or not new_password or not confirm_password:
+                        if not new_email or not new_password or not confirm_password:
                 st.warning("الرجاء تعبئة جميع الحقول")
             elif new_password != confirm_password:
                 st.error("كلمتا المرور غير متطابقتين")
@@ -120,8 +120,9 @@ if not st.session_state.logged_in:
                 st.error("هذا البريد مسجل مسبقاً")
             else:
                 st.session_state.users[new_email] = new_password
-                st.success("تم إنشاء الحساب تجريبياً!")
+                st.session_state.logged_in = True
                 st.session_state.show_signup = False
+                st.success("تم إنشاء حسابك بنجاح! مرحباً بك في أمان 🛡️")
                 st.rerun()
 
         if st.button("العودة إلى تسجيل الدخول"):
@@ -153,9 +154,12 @@ if not st.session_state.logged_in:
 
 # ===== نهاية نظام الدخول =====
 
+# زر تسجيل الخروج
 if st.session_state.logged_in:
+    st.sidebar.markdown("### حسابك")
     if st.sidebar.button("تسجيل الخروج"):
         st.session_state.logged_in = False
+        st.session_state.show_signup = False
         st.rerun()
                 
 # عرض اللوجو
