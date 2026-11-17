@@ -373,29 +373,29 @@ with tab1:
 
         
         
+        
         # إعطاء النتيجة
         if score >= 6:
             st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
             st.markdown(
-    """
-    <div style="
-        background: linear-gradient(135deg, #3B101B, #641B2B);
-        color: #FFFFFF;
-        padding: 22px;
-        border-radius: 16px;
-        text-align: center;
-        font-size: 23px;
-        font-weight: bold;
-        border: 2px solid #FF4D5A;
-        box-shadow: 0 0 18px rgba(255, 77, 90, 0.35);
-    ">
-        🚨 إنذار أمان 🚨<br>
-        احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
-    </div>
-    """,
-    unsafe_allow_html=True
-
+                """
+                <div style="
+                    background: linear-gradient(135deg, #3B101B, #641B2B);
+                    color: #FFFFFF;
+                    padding: 22px;
+                    border-radius: 16px;
+                    text-align: center;
+                    font-size: 23px;
+                    font-weight: bold;
+                    border: 2px solid #FF4D5A;
+                    box-shadow: 0 0 18px rgba(255, 77, 90, 0.35);
+                ">
+                    🚨 إنذار أمان 🚨<br>
+                    احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
+                </div>
+                """,
+                unsafe_allow_html=True
             )
 
             st.write("**أسباب التحذير:**")
@@ -420,7 +420,7 @@ with tab1:
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-                     elif score >= 3:
+        elif score >= 3:
             st.markdown(
                 """
                 <div style="
