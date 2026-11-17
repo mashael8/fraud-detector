@@ -165,6 +165,20 @@ if not st.session_state.logged_in:
     white-space: nowrap !important;
     margin-bottom: 25px !important;
 }
+/* توحيد عرض حقول تسجيل الدخول */
+.stTextInput {
+    width: 100% !important;
+}
+
+.stTextInput input {
+    min-height: 55px !important;
+    border-radius: 12px !important;
+}
+
+/* توسيط أزرار الدخول وإنشاء الحساب */
+.stButton {
+    margin-top: 10px;
+}
         </style>
         """,
         unsafe_allow_html=True
