@@ -420,8 +420,26 @@ with tab1:
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-        elif score >= 3:
-            st.warning("⚠️ تنبيه! توجد مؤشرات تستدعي الحذر.")
+              elif score >= 3:
+            st.markdown(
+                """
+                <div style="
+                    background: linear-gradient(135deg, #392B16, #59401A);
+                    color: #FFFFFF;
+                    padding: 20px;
+                    border-radius: 16px;
+                    text-align: right;
+                    font-size: 21px;
+                    font-weight: bold;
+                    border: 2px solid #FFB547;
+                    box-shadow: 0 0 15px rgba(255, 181, 71, 0.2);
+                ">
+                    ⚠️ تنبيه! توجد مؤشرات تستدعي الحذر.
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
             st.write("**أسباب التنبيه:**")
             for reason in reasons:
                 st.write(f"- {reason}")
