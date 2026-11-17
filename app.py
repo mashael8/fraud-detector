@@ -339,11 +339,10 @@ with tab1:
             
             # فحص الروابط
             urls = re.findall(
-                r'(https?://[^\s]+|www\.[^\s]+)',
-                message,
-                re.IGNORECASE
-            )
-
+    r'(https?://[^\s]+|www\.[^\s]+|(?:bit\.ly|tinyurl\.com|t\.co|goo\.gl|is\.gd|cutt\.ly|rb\.gy|ow\.ly)/[^\s]+)',
+    message,
+    re.IGNORECASE
+)
             if urls:
                 score += 2
                 reasons.append("وجود رابط إلكتروني في الرسالة")
