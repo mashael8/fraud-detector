@@ -162,6 +162,9 @@ if not st.session_state.logged_in:
         """,
         unsafe_allow_html=True
     )
+    logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
+
+with logo_col2:
     st.image("logo.png", width=130)
 
     if st.session_state.show_signup:
