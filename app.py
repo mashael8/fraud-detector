@@ -111,8 +111,8 @@ if not st.session_state.logged_in:
         new_password = st.text_input("كلمة المرور الجديدة", type="password")
         confirm_password = st.text_input("تأكيد كلمة المرور", type="password")
 
-        if st.button("إنشاء الحساب"):
-                        if not new_email or not new_password or not confirm_password:
+                if st.button("إنشاء الحساب"):
+            if not new_email or not new_password or not confirm_password:
                 st.warning("الرجاء تعبئة جميع الحقول")
             elif new_password != confirm_password:
                 st.error("كلمتا المرور غير متطابقتين")
@@ -122,7 +122,7 @@ if not st.session_state.logged_in:
                 st.session_state.users[new_email] = new_password
                 st.session_state.logged_in = True
                 st.session_state.show_signup = False
-                st.success("تم إنشاء حسابك بنجاح! مرحباً بك في أمان 🛡️")
+                st.success("تم إنشاء حسابك بنجاح!")
                 st.rerun()
 
         if st.button("العودة إلى تسجيل الدخول"):
