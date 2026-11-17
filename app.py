@@ -118,6 +118,16 @@ html, body, [class*="css"] {
 .block-container {
     padding-top: 7rem !important;
 }
+/* تأثير البطاقة الزجاجية */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: rgba(16, 43, 73, 0.55) !important;
+    border: 1px solid rgba(0, 224, 198, 0.35) !important;
+    border-radius: 22px !important;
+    box-shadow:
+        0 0 20px rgba(0, 224, 198, 0.12),
+        inset 0 0 20px rgba(0, 184, 217, 0.05) !important;
+    padding: 20px !important;
+}
 </style>
 """
 
