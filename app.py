@@ -11,64 +11,76 @@ st.set_page_config(page_title="أمان", page_icon="🛡️", layout="centered"
 
 # إخفاء شعار Streamlit وتكبير الخط
 # تصميم التطبيق (CSS) - النسخة النهائية
+
 hide_streamlit_style = """
-            <style>
-            /* إخفاء العناصر الافتراضية */
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            [data-testid="stStatusWidget"] {visibility: hidden;}
-           
-            /* لون الخلفية (أبيض مائل للرمادي الفاتح) */
-            .stApp {
-                background-color: #F8F9FA;
-            }
-           
-            /* لون النصوص (أزرق داكن للقراءة المريحة) */
-            h1, h2, h3, p, label, .stMarkdown {
-                color: #0B192C !important;
-                text-align: right;
-            }
-           
-            /* تكبير الخط الأساسي */
-            html, body, [class*="css"]  {
-                font-size: 20px !important;
-                text-align: right;
-            }
-           
-            /* تنسيق الأزرار (أخضر داكن) */
-            .stButton > button {
-                background-color: #1E7D32; /* أخضر */
-                color: white;
-                border-radius: 10px;
-                padding: 12px 24px;
-                font-size: 18px;
-                border: none;
-                width: 100%;
-                font-weight: bold;
-            }
-           
-            /* تأثير عند تمرير الماوس على الزر */
-            .stButton > button:hover {
-                background-color: #145A23;
-                color: white;
-            }
-           
-            /* تنسيق مربع النص */
-            .stTextArea textarea {
-                background-color: #FFFFFF;
-                color: #0B192C;
-                border-radius: 10px;
-                border: 2px solid #1E7D32;
-            }
-           
-            /* تنسيق التنبيهات */
-            .stAlert {
-                border-radius: 10px;
-                border-right: 5px solid #1E7D32; /* خط أخضر على اليمين */
-            }
-            </style>
-            """
+<style>
+/* الخلفية الرئيسية */
+.stApp {
+    background: linear-gradient(135deg, #061426, #0B2545, #071A30);
+}
+
+/* إخفاء عناصر Streamlit */
+#MainMenu, footer, header,
+[data-testid="stStatusWidget"] {
+    visibility: hidden;
+}
+
+/* النصوص */
+h1, h2, h3, p, label, .stMarkdown,
+.stText, span {
+    color: #EAF6FF !important;
+    text-align: right;
+}
+
+/* الخط */
+html, body, [class*="css"] {
+    font-size: 18px !important;
+    text-align: right;
+}
+
+/* الأزرار */
+.stButton > button {
+    background: linear-gradient(90deg, #00B8D9, #00E0C6);
+    color: #041525 !important;
+    border: 1px solid #00E0C6;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: bold;
+    width: 100%;
+    box-shadow: 0 0 14px rgba(0, 224, 198, 0.25);
+}
+
+/* تأثير المرور */
+.stButton > button:hover {
+    background: #00E0C6;
+    color: #041525 !important;
+    box-shadow: 0 0 22px rgba(0, 224, 198, 0.6);
+}
+
+/* حقول الإدخال */
+.stTextInput input,
+.stTextArea textarea {
+    background-color: #102B49 !important;
+    color: white !important;
+    border: 1px solid #00B8D9 !important;
+    border-radius: 10px;
+}
+
+/* البطاقات */
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background-color: rgba(16, 43, 73, 0.65);
+    border: 1px solid rgba(0, 184, 217, 0.25);
+    border-radius: 15px;
+}
+
+/* التنبيهات */
+.stAlert {
+    border-radius: 12px;
+}
+</style>
+"""
+
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ===== نظام الدخول التجريبي =====
