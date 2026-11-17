@@ -77,8 +77,8 @@ st.image("logo.png", width=200)
 # التبويبات
 tab1 = st.container()
 # عنوان التطبيق
-st.title("تطبيق أمان")
-st.write("أهلاً بك! إما أن تضغط على زر المايك وتتحدث، أو تكتب الرسالة في المربع.")
+st.title("🛡️ أمان – نظام الفحص الشامل")
+st.write("مرحباً بك في أمان. أدخل الرسالة أو الرابط الذي تريد فحصه، وسنساعدك على اكتشاف مؤشرات الاحتيال.")
 
 # 1. زر التسجيل الصوتي
 audio_bytes = audio_recorder(text="اضغط على المايك وتحدث", recording_color="#e83e2a", neutral_color="#ffffff", icon_size="2x")
@@ -101,7 +101,7 @@ with tab1:
             message = ""
 
     # 2. خيار الكتابة
-    message_text = st.text_area("أو اكتب الرسالة هنا:", value=message, height=100)
+    message_text = st.text_area("أدخل الرسالة أو النص أو الرابط المراد فحصه:", value=message, height=150)
     if message_text:
         message = message_text
     # 3. زر التحليل
