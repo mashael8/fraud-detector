@@ -17,6 +17,7 @@ st.set_page_config(
 # إخفاء شعار Streamlit وتكبير الخط
 # تصميم التطبيق (CSS) - النسخة النهائية
 
+
 hide_streamlit_style = """
 <style>
 /* الخلفية الرئيسية */
@@ -30,37 +31,23 @@ hide_streamlit_style = """
     visibility: hidden;
 }
 
-/* النصوص */
+/* اتجاه ومحاذاة النصوص */
 h1, h2, h3, p, label, .stMarkdown,
 .stText, span {
     color: #EAF6FF !important;
     text-align: right;
 }
 
-/* الخط */
+/* عنوان تسجيل الدخول */
+h1 {
+    font-size: 44px !important;
+    font-weight: bold !important;
+    margin-bottom: 18px !important;
+}
+
+/* الخط الأساسي */
 html, body, [class*="css"] {
     font-size: 18px !important;
-    text-align: right;
-}
-
-/* الأزرار */
-.stButton > button {
-    background: linear-gradient(90deg, #00B8D9, #00E0C6);
-    color: #041525 !important;
-    border: 1px solid #00E0C6;
-    border-radius: 12px;
-    padding: 12px 24px;
-    font-size: 18px;
-    font-weight: bold;
-    width: 100%;
-    box-shadow: 0 0 14px rgba(0, 224, 198, 0.25);
-}
-
-/* تأثير المرور */
-.stButton > button:hover {
-    background: #00E0C6;
-    color: #041525 !important;
-    box-shadow: 0 0 22px rgba(0, 224, 198, 0.6);
 }
 
 /* حقول الإدخال */
@@ -69,7 +56,45 @@ html, body, [class*="css"] {
     background-color: #102B49 !important;
     color: white !important;
     border: 1px solid #00B8D9 !important;
-    border-radius: 10px;
+    border-radius: 12px !important;
+    min-height: 52px;
+    font-size: 18px !important;
+    text-align: right !important;
+}
+
+/* إطار الحقول عند التحديد */
+.stTextInput input:focus,
+.stTextArea textarea:focus {
+    border: 2px solid #00E0C6 !important;
+    box-shadow: 0 0 12px rgba(0, 224, 198, 0.25);
+}
+
+/* تسميات الحقول */
+.stTextInput label {
+    color: #EAF6FF !important;
+    font-size: 18px !important;
+}
+
+/* الأزرار */
+.stButton > button {
+    background: linear-gradient(90deg, #00B8D9, #00E0C6);
+    color: #041525 !important;
+    border: 1px solid #00E0C6;
+    border-radius: 14px;
+    padding: 12px 28px;
+    font-size: 18px;
+    font-weight: bold;
+    width: auto;
+    min-height: 52px;
+    box-shadow: 0 0 14px rgba(0, 224, 198, 0.3);
+}
+
+/* تأثير المرور */
+.stButton > button:hover {
+    background: #00E0C6;
+    color: #041525 !important;
+    box-shadow: 0 0 22px rgba(0, 224, 198, 0.6);
+    border-color: #00E0C6;
 }
 
 /* البطاقات */
@@ -83,10 +108,16 @@ html, body, [class*="css"] {
 .stAlert {
     border-radius: 12px;
 }
+
+/* الشعار */
+[data-testid="stImage"] {
+    margin-bottom: 20px;
+}
 </style>
 """
 
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 
 # ===== نظام الدخول التجريبي =====
 
