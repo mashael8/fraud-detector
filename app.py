@@ -168,7 +168,7 @@ if st.button("تحليل الرسالة", use_container_width=True):
                 components.html(
                     f"""
                     <audio autoplay>
-                        <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mpeg">
+                        <source src="data:audio/mpeg;base64,{audio_base64}" type="audio/mpeg">
                     </audio>
                     """,
                     height=0
