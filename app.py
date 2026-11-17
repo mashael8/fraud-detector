@@ -420,7 +420,7 @@ with tab1:
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-              elif score >= 3:
+                     elif score >= 3:
             st.markdown(
                 """
                 <div style="
