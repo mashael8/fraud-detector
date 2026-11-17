@@ -148,10 +148,15 @@ if not st.session_state.logged_in:
         }
 
         [data-testid="stImage"] {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin: 0 auto 25px auto !important;
+}
+
+[data-testid="stImage"] img {
+    margin: 0 auto !important;
+}
 
         </style>
         """,
