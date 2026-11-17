@@ -137,6 +137,26 @@ if "users" not in st.session_state:
 
 
 if not st.session_state.logged_in:
+    # تحسين تصميم صفحة تسجيل الدخول
+    st.markdown(
+        """
+        <style>
+        .block-container {
+            max-width: 850px !important;
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        [data-testid="stImage"] {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     st.image("logo.png", width=130)
 
     if st.session_state.show_signup:
