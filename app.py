@@ -74,6 +74,14 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # عرض اللوجو
 st.image("logo.png", width=200)
 
+# التبويبات
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📩 فحص الرسائل",
+    "🔗 فحص الروابط",
+    "🖼️ فحص الصور",
+    "📱 محاكاة SMS",
+    "🛡️ الفحص الشامل"
+])
 # عنوان التطبيق
 st.title("تطبيق أمان")
 st.write("أهلاً بك! إما أن تضغط على زر المايك وتتحدث، أو تكتب الرسالة في المربع.")
@@ -83,52 +91,122 @@ audio_bytes = audio_recorder(text="اضغط على المايك وتحدث", rec
 
 message = ""
 
-# إذا تم تسجيل صوت
-if audio_bytes:
-    st.audio(audio_bytes, format="audio/wav")
-    r = sr.Recognizer()
-    try:
-        with sr.AudioFile(io.BytesIO(audio_bytes)) as source:
-            audio_data = r.record(source)
-            text_from_audio = r.recognize_google(audio_data, language="ar-SA")
-            st.success(f"تم التعرف على النص: {text_from_audio}")
-            message = text_from_audio
-    except Exception as e:
-        st.error("عذراً، لم نتمكن من التعرف على الصوت. جرب الكتابة أو أعد التسجيل.")
-        message = ""
+with tab1:
+    # إذا تم تسجيل صوت
+    if audio_bytes:
+        st.audio(audio_bytes, format="audio/wav")
+        r = sr.Recognizer()
+        try:
+            with sr.AudioFile(io.BytesIO(audio_bytes)) as source:
+                audio_data = r.record(source)
+                text_from_audio = r.recognize_google(audio_data, language="ar-SA")
+                st.success(f"تم التعرف على النص: {text_from_audio}")
+                message = text_from_audio
+        except Exception as e:
+            st.error("عذراً، لم نتمكن من التعرف على الصوت. جرب الكتابة أو أعد التسجيل.")
+            message = ""
 
-# 2. خيار الكتابة
-message_text = st.text_area("أو اكتب الرسالة هنا:", value=message, height=100)
-if message_text:
-    message = message_text
+    # 2. خيار الكتابة
+    message_text = st.text_area("أو اكتب الرسالة هنا:", value=message, height=100)
+    if message_text:
+        message = message_text
+    # 3. زر التحليل
+    if st.button("تحليل الرسالة", use_container_width=True):
+        if message:
+            score = 0
+            reasons = []
 
-# 3. زر التحليل
-if st.button("تحليل الرسالة", use_container_width=True):
-    if message:
-        score = 0
-        reasons = []
-
-        # فحص الكلمات المفتاحية
-        suspicious_words = ["جائزة", "جائزه", "فزت", "ربحت", "بنك", "الراجحي", "أرسل الرمز", "الرمز السري", "حسابك موقوف", "شحنة", "مكافأة", "عاجل", "أبشر", "تحديث بيانات", "بطاقة"]
-        found_words = [word for word in suspicious_words if word in message]
         
-        if found_words:
-            score += 3
-            reasons.append(f"وجود كلمات حساسة ({', '.join(found_words)})")
+            # فحص الكلمات والعبارات المشبوهة
+            suspicious_words = [
+                # الجوائز والإغراءات
+                "جائزة", "جائزه", "فزت", "ربحت", "مبروك", "هدية مجانية",
+                "سحب", "اربح", "كسبت", "جائزة نقدية",
 
-        # فحص طلب معلومات سرية
-        if re.search(r"(رمز|كود|OTP|OTP).*(تحقق|سري)", message, re.IGNORECASE):
-            score += 4
-            reasons.append("طلب رمز تحقق (OTP) أو معلومات سرية")
+                # التهديد والاستعجال
+                "حسابك موقوف", "حسابك مغلق", "سيتم إيقاف حسابك",
+                "آخر فرصة", "عاجل", "فورا", "خلال 24 ساعة",
+                "اتخذ إجراء", "تأكيد الحساب",
 
-        # فحص الروابط
-        urls = re.findall(r'(https?://\S+|www\.\S+)', message)
-        if urls:
-            score += 2
-            reasons.append("وجود رابط إلكتروني في الرسالة")
-            if any(short in urls[0].lower() for short in ["bit.ly", "tinyurl", "t.co", "goo.gl"]):
+                # البنوك والمدفوعات
+                "البنك", "الراجحي", "الأهلي", "بنك الرياض",
+                "تحديث بيانات", "بيانات البطاقة", "بطاقتك البنكية",
+                "عملية مشبوهة", "استرداد مبلغ", "حوالة مالية",
+
+                # المعلومات السرية
+                "الرمز السري", "رمز التحقق", "رمز التأكيد",
+                "كلمة المرور", "الرقم السري", "بيانات الدخول",
+                "أرسل الرمز", "شارك الرمز", "كود التحقق",
+
+                # الشحن والتوصيل
+                "شحنتك معلقة", "تعذر تسليم الشحنة",
+                "رسوم التوصيل", "تأكيد عنوانك", "طردك",
+
+                # انتحال الجهات
+                "أبشر", "نفاذ", "وزارة الداخلية",
+                "مؤسسة النقد", "البريد السعودي"
+            ]
+
+            found_words = [
+                word for word in suspicious_words
+                if word in message
+            ]
+
+            if found_words:
                 score += 3
-                reasons.append("رابط مختصر مشبوه (يخفي الوجهة الحقيقية)")
+                reasons.append(
+                    f"وجود عبارات مشبوهة ({', '.join(found_words)})"
+                )
+
+
+        
+            # فحص طلب المعلومات السرية
+            sensitive_patterns = [
+                r"(رمز|كود|otp).*(تحقق|تأكيد|سري)",
+                r"(تحقق|تأكيد).*(رمز|كود|otp)",
+                r"(أرسل|ارسل|شارك|أدخل|ادخل).*(رمز|كود|كلمة المرور|الرقم السري)",
+                r"(كلمة المرور|الرقم السري|بيانات الدخول)",
+                r"(رقم البطاقة|تاريخ الانتهاء|رمز cvv)",
+                r"(بياناتك البنكية|معلوماتك المصرفية)"
+            ]
+
+            if any(re.search(pattern, message, re.IGNORECASE)
+                   for pattern in sensitive_patterns):
+                score += 4
+                reasons.append("طلب معلومات سرية أو بيانات بنكية")
+
+
+       
+            # فحص الروابط
+            urls = re.findall(
+                r'(https?://[^\s]+|www\.[^\s]+)',
+                message,
+                re.IGNORECASE
+            )
+
+            if urls:
+                score += 2
+                reasons.append("وجود رابط إلكتروني في الرسالة")
+
+                suspicious_domains = [
+                    "bit.ly", "tinyurl.com", "t.co",
+                    "goo.gl", "is.gd", "cutt.ly",
+                    "rb.gy", "ow.ly"
+                ]
+
+                for url in urls:
+                    if any(domain in url.lower() for domain in suspicious_domains):
+                        score += 3
+                        reasons.append("وجود رابط مختصر قد يخفي الوجهة الحقيقية")
+                        break
+
+                suspicious_extensions = [
+                    ".xyz", ".top", ".click", ".work"
+                ]
+
+                if any(ext in url.lower() for ext in suspicious_extensions):
+                    score += 2
+                    reasons.append("وجود نطاق يستحق التحقق منه")
 
         
         # إعطاء النتيجة
@@ -177,8 +255,15 @@ if st.button("تحليل الرسالة", use_container_width=True):
             except FileNotFoundError:
                 st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
+                elif score >= 3:
+            st.warning("⚠️ تنبيه! توجد مؤشرات تستدعي الحذر.")
+            st.write("**أسباب التنبيه:**")
+            for reason in reasons:
+                st.write(f"- {reason}")
+            st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
+
         else:
-            st.success("✅ لا توجد مؤشرات كافية على الاحتيال.")
-            st.write("لا تشارك بياناتك الشخصية أو رموز التحقق.")
+            st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+            st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
     else:
         st.warning("الرجاء إدخال رسالة أولاً.")
