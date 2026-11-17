@@ -189,6 +189,16 @@ if not st.session_state.logged_in:
 .stButton {
     margin-top: 10px;
 }
+/* توهج أزرار تسجيل الدخول */
+.stButton > button {
+    box-shadow: 0 0 15px rgba(0, 224, 198, 0.3) !important;
+    transition: all 0.3s ease;
+}
+
+.stButton > button:hover {
+    box-shadow: 0 0 25px rgba(0, 224, 198, 0.7) !important;
+    transform: translateY(-2px);
+}
         </style>
         """,
         unsafe_allow_html=True
