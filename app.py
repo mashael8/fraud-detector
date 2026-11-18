@@ -411,59 +411,29 @@ with tab1:
         
             # إعطاء النتيجة
             if score >= 6:
-                st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
+    st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
-                st.markdown(
-                    """
-                    <div style="
-                        background: linear-gradient(135deg, #3B101B, #641B2B);
-                        color: #FFFFFF;
-                        padding: 22px;
-                        border-radius: 16px;
-                        text-align: center;
-                        font-size: 23px;
-                        font-weight: bold;
-                        border: 2px solid #FF4D5A;
-                    ">
-                        🚨 إنذار أمان 🚨<br>
-                        احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+    st.write("أسباب التحذير:")
+    for reason in reasons:
+        st.write(f"- {reason}")
 
-                st.write("**أسباب التحذير:**")
-                for reason in reasons:
-                    st.write(f"- {reason}")
+    try:
+        warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-                            try:
-                warning_path = Path(__file__).resolve().parent / "warning.mp3"
+        if warning_path.exists():
+            warning_audio = warning_path.read_bytes()
+            st.audio(warning_audio, format="audio/mpeg", autoplay=True)
+        else:
+            st.error("ملف الإنذار غير موجود.")
 
-                if warning_path.exists():
-                    warning_audio = warning_path.read_bytes()
+    except Exception as e:
+        st.error(f"تعذر تشغيل الإنذار: {e}")
 
-                    st.audio(
-                        warning_audio,
-                        format="audio/mpeg",
-                        autoplay=True
-                    )
-                else:
-                    st.error("ملف الإنذار warning.mp3 غير موجود.")
+elif score >= 3:
+    st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
 
-            except Exception as e:
-                st.error(f"تعذر تشغيل الإنذار: {e}")
-
-            elif score >= 3:
-                st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
-
-                st.write("**أسباب التنبيه:**")
-                for reason in reasons:
-                    st.write(f"- {reason}")
-
-                st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
-
-            else:
-                st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+else:
+    st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
                 st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
 
     else:
