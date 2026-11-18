@@ -437,24 +437,17 @@ with tab1:
             for reason in reasons:
                 st.write(f"- {reason}")
 
-            try:
-                with open("warning.mp3", "rb") as audio_file:
-                    audio_bytes = audio_file.read()
+                        try:
+                warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-                audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+                if warning_path.exists():
+                    warning_audio = warning_path.read_bytes()
+                    st.audio(warning_audio, format="audio/mpeg")
+                else:
+                    st.error("ملف الإنذار warning.mp3 غير موجود.")
 
-                components.html(
-                    f"""
-                    <audio autoplay>
-                        <source src="data:audio/mpeg;base64,{audio_base64}" type="audio/mpeg">
-                    </audio>
-                    """,
-                    height=0
-                )
-
-            except FileNotFoundError:
-                st.warning("ملف الإنذار warning.mp3 غير موجود.")
-
+            except Exception as e:
+                st.error(f"تعذر تشغيل الإنذار: {e}")
         elif score >= 3:
             st.markdown(
                 """
