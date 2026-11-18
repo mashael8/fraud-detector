@@ -147,7 +147,7 @@ if "users" not in st.session_state:
 
 
 if not st.session_state.logged_in:
-    # تحسين تصميم صفحة تسجيل الدخول
+
     st.markdown(
         """
         <style>
@@ -156,58 +156,18 @@ if not st.session_state.logged_in:
             padding-top: 2rem !important;
             padding-bottom: 2rem !important;
         }
-
-        [data-testid="stImage"] {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 0 auto 25px auto !important;
-}
-
-[data-testid="stImage"] img {
-    margin: 0 auto !important;
-}
-
-/* تنسيق عنوان تسجيل الدخول */
-.stApp h1 {
-    font-size: 36px !important;
-    text-align: center !important;
-    white-space: nowrap !important;
-    margin-bottom: 25px !important;
-}
-/* توحيد عرض حقول تسجيل الدخول */
-.stTextInput {
-    width: 100% !important;
-}
-
-.stTextInput input {
-    min-height: 55px !important;
-    border-radius: 12px !important;
-}
-
-/* توسيط أزرار الدخول وإنشاء الحساب */
-.stButton {
-    margin-top: 10px;
-}
-/* توهج أزرار تسجيل الدخول */
-.stButton > button {
-    box-shadow: 0 0 15px rgba(0, 224, 198, 0.3) !important;
-    transition: all 0.3s ease;
-}
-
-.stButton > button:hover {
-    box-shadow: 0 0 25px rgba(0, 224, 198, 0.7) !important;
-    transform: translateY(-2px);
-}
         </style>
         """,
         unsafe_allow_html=True
     )
-        logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
+
+    logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
 
     with logo_col2:
         st.image("logo.png", width=130)
+
     if st.session_state.show_signup:
+
         st.title("إنشاء حساب جديد")
         st.write("أنشئ حسابك للانضمام إلى أمان")
 
@@ -233,13 +193,12 @@ if not st.session_state.logged_in:
             st.session_state.show_signup = False
             st.rerun()
 
-    
     else:
+
         st.title("تسجيل الدخول إلى أمان")
         st.write("مرحباً بك، سجّل الدخول للمتابعة")
 
         email = st.text_input("البريد الإلكتروني")
-
         show_password = st.checkbox("إظهار كلمة المرور")
 
         password = st.text_input(
