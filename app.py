@@ -441,7 +441,11 @@ with tab1:
 
                     if warning_path.exists():
                         warning_audio = warning_path.read_bytes()
-                        st.audio(warning_audio, format="audio/mpeg")
+                        st.ast.audio(
+    warning_audio,
+    format="audio/mpeg",
+    autoplay=True
+)udio(warning_audio, format="audio/mpeg")
                     else:
                         st.error("ملف الإنذار غير موجود.")
 
