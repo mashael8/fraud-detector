@@ -409,53 +409,57 @@ with tab1:
         
         
         
-        # إعطاء النتيجة
-                if score >= 6:
-            st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
+            # إعطاء النتيجة
+            if score >= 6:
+                st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
-            st.write("**أسباب التحذير:**")
-            for reason in reasons:
-                st.write(f"- {reason}")
+                st.markdown(
+                    """
+                    <div style="
+                        background: linear-gradient(135deg, #3B101B, #641B2B);
+                        color: #FFFFFF;
+                        padding: 22px;
+                        border-radius: 16px;
+                        text-align: center;
+                        font-size: 23px;
+                        font-weight: bold;
+                        border: 2px solid #FF4D5A;
+                    ">
+                        🚨 إنذار أمان 🚨<br>
+                        احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-            try:
-                warning_path = Path(__file__).resolve().parent / "warning.mp3"
+                st.write("**أسباب التحذير:**")
+                for reason in reasons:
+                    st.write(f"- {reason}")
 
-                if warning_path.exists():
-                    warning_audio = warning_path.read_bytes()
-                    st.audio(warning_audio, format="audio/mpeg")
-                else:
-                    st.error("ملف الإنذار warning.mp3 غير موجود.")
+                try:
+                    warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-            except Exception as e:
-                st.error(f"تعذر تشغيل الإنذار: {e}")
-        elif score >= 3:
-            st.markdown(
-                """
-                <div style="
-                    background: linear-gradient(135deg, #392B16, #59401A);
-                    color: #FFFFFF;
-                    padding: 20px;
-                    border-radius: 16px;
-                    text-align: right;
-                    font-size: 21px;
-                    font-weight: bold;
-                    border: 2px solid #FFB547;
-                    box-shadow: 0 0 15px rgba(255, 181, 71, 0.2);
-                ">
-                    ⚠️ تنبيه! توجد مؤشرات تستدعي الحذر.
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+                    if warning_path.exists():
+                        warning_audio = warning_path.read_bytes()
+                        st.audio(warning_audio, format="audio/mpeg")
+                    else:
+                        st.error("ملف الإنذار غير موجود.")
 
-            st.write("**أسباب التنبيه:**")
-            for reason in reasons:
-                st.write(f"- {reason}")
-            st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
+                except Exception as e:
+                    st.error(f"تعذر تشغيل الإنذار: {e}")
 
-        else:
-            st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
-            st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
+            elif score >= 3:
+                st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
+
+                st.write("**أسباب التنبيه:**")
+                for reason in reasons:
+                    st.write(f"- {reason}")
+
+                st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
+
+            else:
+                st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+                st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
 
     else:
         st.warning("الرجاء إدخال رسالة أولاً.")
