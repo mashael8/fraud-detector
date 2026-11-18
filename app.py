@@ -436,21 +436,22 @@ with tab1:
                 for reason in reasons:
                     st.write(f"- {reason}")
 
-                try:
-                    warning_path = Path(__file__).resolve().parent / "warning.mp3"
+                            try:
+                warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-                    if warning_path.exists():
-                        warning_audio = warning_path.read_bytes()
-                        st.ast.audio(
-    warning_audio,
-    format="audio/mpeg",
-    autoplay=True
-)udio(warning_audio, format="audio/mpeg")
-                    else:
-                        st.error("ملف الإنذار غير موجود.")
+                if warning_path.exists():
+                    warning_audio = warning_path.read_bytes()
 
-                except Exception as e:
-                    st.error(f"تعذر تشغيل الإنذار: {e}")
+                    st.audio(
+                        warning_audio,
+                        format="audio/mpeg",
+                        autoplay=True
+                    )
+                else:
+                    st.error("ملف الإنذار warning.mp3 غير موجود.")
+
+            except Exception as e:
+                st.error(f"تعذر تشغيل الإنذار: {e}")
 
             elif score >= 3:
                 st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
