@@ -453,6 +453,7 @@ with tab1:
         
         
                         
+
 # إعطاء النتيجة ودرجة الخطورة
 
 if score >= 6:
@@ -460,43 +461,11 @@ if score >= 6:
     st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
     st.markdown(
-        """
-        <div style="
-            background: linear-gradient(135deg, #3B101B, #641B2B);
-            color: white;
-            padding: 22px;
-            border-radius: 16px;
-            text-align: center;
-            font-size: 23px;
-            font-weight: bold;
-            border: 2px solid #FF4D5A;
-        ">
-            🚨 إنذار أمان 🚨<br>
-            احذر! لا تضغط على الروابط ولا تشارك بياناتك السرية.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
         f"""
-        <div style="
-            background:#641B2B;
-            border:2px solid #FF4D5A;
-            border-radius:15px;
-            padding:20px;
-            text-align:center;
-            margin-top:15px;
-        ">
-            <div style="color:white;font-size:20px;">
-                مستوى الخطورة
-            </div>
-            <div style="
-                color:#FF5252;
-                font-size:35px;
-                font-weight:bold;
-                margin:10px;
-            ">
+        <div style="background:#641B2B; border:2px solid #FF4D5A;
+        border-radius:15px; padding:20px; text-align:center;">
+            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+            <div style="color:#FF5252;font-size:35px;font-weight:bold;">
                 مرتفع 🔴
             </div>
             <div style="color:white;font-size:22px;">
@@ -511,37 +480,29 @@ if score >= 6:
     for reason in reasons:
         st.write(f"- {reason}")
 
-    
-# تشغيل صوت الإنذار دون إظهار مشغل صوت
-try:
-    warning_path = Path(__file__).resolve().parent / "warning.mp3"
+    # تشغيل صوت الإنذار
+    try:
+        warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-    if warning_path.exists():
-        audio_base64 = base64.b64encode(
-            warning_path.read_bytes()
-        ).decode("utf-8")
+        if warning_path.exists():
+            audio_base64 = base64.b64encode(
+                warning_path.read_bytes()
+            ).decode("utf-8")
 
-        components.html(
-            f"""
-            <audio id="aman_alarm" autoplay>
-                <source
-                    src="data:audio/mpeg;base64,{audio_base64}"
+            components.html(
+                f"""
+                <audio autoplay>
+                    <source src="data:audio/mpeg;base64,{audio_base64}"
                     type="audio/mpeg">
-            </audio>
-            <script>
-                const alarm = document.getElementById("aman_alarm");
-                alarm.play().catch(error => {{
-                    console.log("تعذر التشغيل التلقائي:", error);
-                }});
-            </script>
-            """,
-            height=0
-        )
-    else:
-        st.warning("ملف الإنذار warning.mp3 غير موجود.")
+                </audio>
+                """,
+                height=0
+            )
+        else:
+            st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-except Exception as e:
-    st.warning(f"تعذر تشغيل الإنذار: {e}")
+    except Exception as e:
+        st.warning(f"تعذر تشغيل الإنذار: {e}")
 
 elif score >= 3:
 
@@ -549,21 +510,10 @@ elif score >= 3:
 
     st.markdown(
         f"""
-        <div style="
-            background:#594316;
-            border:2px solid #FFC107;
-            border-radius:15px;
-            padding:20px;
-            text-align:center;
-        ">
-            <div style="color:white;font-size:20px;">
-                مستوى الخطورة
-            </div>
-            <div style="
-                color:#FFD54F;
-                font-size:30px;
-                font-weight:bold;
-            ">
+        <div style="background:#594316; border:2px solid #FFC107;
+        border-radius:15px; padding:20px; text-align:center;">
+            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+            <div style="color:#FFD54F;font-size:30px;font-weight:bold;">
                 متوسط 🟡
             </div>
             <div style="color:white;font-size:21px;">
@@ -586,21 +536,10 @@ else:
 
     st.markdown(
         f"""
-        <div style="
-            background:#123D35;
-            border:2px solid #00E0A0;
-            border-radius:15px;
-            padding:20px;
-            text-align:center;
-        ">
-            <div style="color:white;font-size:20px;">
-                مستوى الخطورة
-            </div>
-            <div style="
-                color:#00E0A0;
-                font-size:30px;
-                font-weight:bold;
-            ">
+        <div style="background:#123D35; border:2px solid #00E0A0;
+        border-radius:15px; padding:20px; text-align:center;">
+            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+            <div style="color:#00E0A0;font-size:30px;font-weight:bold;">
                 منخفض 🟢
             </div>
             <div style="color:white;font-size:21px;">
@@ -613,6 +552,5 @@ else:
 
     st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
 
-
-        else:
-            st.warning("الرجاء إدخال رسالة أولاً.")
+else:
+    st.warning("الرجاء إدخال رسالة أولاً.")
