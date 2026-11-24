@@ -511,36 +511,37 @@ if score >= 6:
     for reason in reasons:
         st.write(f"- {reason}")
 
-    # تشغيل صوت الإنذار دون إظهار مشغل صوت
-    try:
-        warning_path = Path(__file__).resolve().parent / "warning.mp3"
+    
+# تشغيل صوت الإنذار دون إظهار مشغل صوت
+try:
+    warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-        if warning_path.exists():
-            audio_base64 = base64.b64encode(
-                warning_path.read_bytes()
-            ).decode("utf-8")
+    if warning_path.exists():
+        audio_base64 = base64.b64encode(
+            warning_path.read_bytes()
+        ).decode("utf-8")
 
-            components.html(
-                f"""
-                <audio id="aman_alarm" autoplay>
-                    <source
-                        src="data:audio/mpeg;base64,{audio_base64}"
-                        type="audio/mpeg">
-                </audio>
-                <script>
-                    const alarm = document.getElementById("aman_alarm");
-                    alarm.play().catch(error => {
-                        console.log("تعذر التشغيل التلقائي:", error);
-                    });
-                </script>
-                """,
-                height=0
-            )
-        else:
-            st.warning("ملف الإنذار warning.mp3 غير موجود.")
+        components.html(
+            f"""
+            <audio id="aman_alarm" autoplay>
+                <source
+                    src="data:audio/mpeg;base64,{audio_base64}"
+                    type="audio/mpeg">
+            </audio>
+            <script>
+                const alarm = document.getElementById("aman_alarm");
+                alarm.play().catch(error => {{
+                    console.log("تعذر التشغيل التلقائي:", error);
+                }});
+            </script>
+            """,
+            height=0
+        )
+    else:
+        st.warning("ملف الإنذار warning.mp3 غير موجود.")
 
-    except Exception as e:
-        st.warning(f"تعذر تشغيل الإنذار: {e}")
+except Exception as e:
+    st.warning(f"تعذر تشغيل الإنذار: {e}")
 
 elif score >= 3:
 
