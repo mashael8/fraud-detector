@@ -32,7 +32,7 @@ st.set_page_config(
 
 GEMINI_MODEL = st.secrets.get(
     "GEMINI_MODEL",
-    "gemini-3.8-flash"
+    "gemini-2.5-flash"
 )
 
 
