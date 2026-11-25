@@ -15,54 +15,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# إخفاء شعار Streamlit وتكبير الخط
-# تصميم التطبيق (CSS) - النسخة النهائية
 
-
+# تصميم التطبيق (CSS)
 hide_streamlit_style = """
-/* تحسين العرض على الجوال */
-@media screen and (max-width: 768px) {
-
-    .block-container {
-        padding: 1rem 0.8rem !important;
-        max-width: 100% !important;
-    }
-
-    h1 {
-        font-size: 27px !important;
-        line-height: 1.5 !important;
-    }
-
-    h2, h3 {
-        font-size: 22px !important;
-    }
-
-    p, label, .stMarkdown {
-        font-size: 16px !important;
-    }
-
-    .stTextInput input,
-    .stTextArea textarea {
-        width: 100% !important;
-        font-size: 16px !important;
-    }
-
-    .stButton > button {
-        width: 100% !important;
-        min-height: 50px !important;
-        font-size: 16px !important;
-    }
-
-    [data-testid="stImage"] img {
-        max-width: 120px !important;
-        height: auto !important;
-    }
-
-    [data-testid="column"] {
-        width: 100% !important;
-        flex: 1 1 100% !important;
-    }
-}
 <style>
 /* الخلفية الرئيسية */
 .stApp {
@@ -172,11 +127,54 @@ html, body, [class*="css"] {
         inset 0 0 20px rgba(0, 184, 217, 0.05) !important;
     padding: 20px !important;
 }
+
+/* تحسين العرض على الجوال */
+@media screen and (max-width: 768px) {
+
+    .block-container {
+        padding: 1rem 0.8rem !important;
+        max-width: 100% !important;
+    }
+
+    h1 {
+        font-size: 27px !important;
+        line-height: 1.5 !important;
+    }
+
+    h2, h3 {
+        font-size: 22px !important;
+    }
+
+    p, label, .stMarkdown {
+        font-size: 16px !important;
+    }
+
+    .stTextInput input,
+    .stTextArea textarea {
+        width: 100% !important;
+        font-size: 16px !important;
+    }
+
+    .stButton > button {
+        width: 100% !important;
+        min-height: 50px !important;
+        font-size: 16px !important;
+    }
+
+    [data-testid="stImage"] img {
+        max-width: 120px !important;
+        height: auto !important;
+    }
+
+    [data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+}
 </style>
 """
 
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
 
 # ===== نظام الدخول التجريبي =====
 
@@ -189,69 +187,7 @@ if "show_signup" not in st.session_state:
 if "users" not in st.session_state:
     st.session_state.users = {}
 
-
 if not st.session_state.logged_in:
-
-    
-st.markdown(
-    """
-    <style>
-    /* التنسيق الأساسي */
-    .block-container {
-        max-width: 850px !important;
-        padding-top: 2rem !important;
-        padding-bottom: 2rem !important;
-    }
-
-    /* تحسين العرض على الجوال */
-    @media screen and (max-width: 768px) {
-
-        .block-container {
-            padding: 1rem 0.8rem !important;
-            max-width: 100% !important;
-        }
-
-        h1 {
-            font-size: 27px !important;
-            line-height: 1.5 !important;
-        }
-
-        h2, h3 {
-            font-size: 22px !important;
-        }
-
-        p, label, .stMarkdown {
-            font-size: 16px !important;
-        }
-
-        .stTextInput input,
-        .stTextArea textarea {
-            width: 100% !important;
-            font-size: 16px !important;
-        }
-
-        .stButton > button {
-            width: 100% !important;
-            min-height: 50px !important;
-            font-size: 16px !important;
-        }
-
-        [data-testid="stImage"] img {
-            max-width: 120px !important;
-            height: auto !important;
-        }
-
-        [data-testid="column"] {
-            width: 100% !important;
-            flex: 1 1 100% !important;
-        }
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
     logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
 
     with logo_col2:
@@ -502,169 +438,104 @@ with tab1:
         
                         
 
-# إعطاء النتيجة ودرجة الخطورة
+            # إعطاء النتيجة ودرجة الخطورة
 
-if score >= 6:
+            if score >= 6:
 
-    st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
+                st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
 
-    st.markdown(
-        f"""
-        <div style="background:#641B2B; border:2px solid #FF4D5A;
-        border-radius:15px; padding:20px; text-align:center;">
-            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
-            <div style="color:#FF5252;font-size:35px;font-weight:bold;">
-                مرتفع 🔴
-            </div>
-            <div style="color:white;font-size:22px;">
-                درجة الخطورة: {score} نقطة
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+                st.markdown(
+                    f"""
+                    <div style="background:#641B2B; border:2px solid #FF4D5A;
+                    border-radius:15px; padding:20px; text-align:center;">
+                        <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+                        <div style="color:#FF5252;font-size:35px;font-weight:bold;">
+                            مرتفع 🔴
+                        </div>
+                        <div style="color:white;font-size:22px;">
+                            درجة الخطورة: {score} نقطة
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
 
-    st.write("**أسباب التحذير:**")
-    for reason in reasons:
-        st.write(f"- {reason}")
+                st.write("**أسباب التحذير:**")
+                for reason in reasons:
+                    st.write(f"- {reason}")
 
-    # تشغيل صوت الإنذار
-    try:
-        warning_path = Path(__file__).resolve().parent / "warning.mp3"
+                # تشغيل صوت الإنذار
+                try:
+                    warning_path = Path(__file__).resolve().parent / "warning.mp3"
 
-        if warning_path.exists():
-            audio_base64 = base64.b64encode(
-                warning_path.read_bytes()
-            ).decode("utf-8")
+                    if warning_path.exists():
+                        audio_base64 = base64.b64encode(
+                            warning_path.read_bytes()
+                        ).decode("utf-8")
 
-            components.html(
-                f"""
-                <audio autoplay>
-                    <source src="data:audio/mpeg;base64,{audio_base64}"
-                    type="audio/mpeg">
-                </audio>
-                """,
-                height=0
-            )
+                        components.html(
+                            f"""
+                            <audio autoplay>
+                                <source src="data:audio/mpeg;base64,{audio_base64}"
+                                type="audio/mpeg">
+                            </audio>
+                            """,
+                            height=0
+                        )
+                    else:
+                        st.warning("ملف الإنذار warning.mp3 غير موجود.")
+
+                except Exception as e:
+                    st.warning(f"تعذر تشغيل الإنذار: {e}")
+
+            elif score >= 3:
+
+                st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
+
+                st.markdown(
+                    f"""
+                    <div style="background:#594316; border:2px solid #FFC107;
+                    border-radius:15px; padding:20px; text-align:center;">
+                        <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+                        <div style="color:#FFD54F;font-size:30px;font-weight:bold;">
+                            متوسط 🟡
+                        </div>
+                        <div style="color:white;font-size:21px;">
+                            درجة الخطورة: {score} نقطة
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                st.write("**أسباب التنبيه:**")
+                for reason in reasons:
+                    st.write(f"- {reason}")
+
+                st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
+
+            else:
+
+                st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+
+                st.markdown(
+                    f"""
+                    <div style="background:#123D35; border:2px solid #00E0A0;
+                    border-radius:15px; padding:20px; text-align:center;">
+                        <div style="color:white;font-size:20px;">مستوى الخطورة</div>
+                        <div style="color:#00E0A0;font-size:30px;font-weight:bold;">
+                            منخفض 🟢
+                        </div>
+                        <div style="color:white;font-size:21px;">
+                            درجة الخطورة: {score} نقطة
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+
+            st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
         else:
-            st.warning("ملف الإنذار warning.mp3 غير موجود.")
+            st.warning("الرجاء إدخال رسالة أولاً.")
 
-    except Exception as e:
-        st.warning(f"تعذر تشغيل الإنذار: {e}")
-
-elif score >= 3:
-
-    st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
-
-    st.markdown(
-        f"""
-        <div style="background:#594316; border:2px solid #FFC107;
-        border-radius:15px; padding:20px; text-align:center;">
-            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
-            <div style="color:#FFD54F;font-size:30px;font-weight:bold;">
-                متوسط 🟡
-            </div>
-            <div style="color:white;font-size:21px;">
-                درجة الخطورة: {score} نقطة
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.write("**أسباب التنبيه:**")
-    for reason in reasons:
-        st.write(f"- {reason}")
-
-    st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
-
-else:
-
-    st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
-
-    st.markdown(
-        f"""
-        <div style="background:#123D35; border:2px solid #00E0A0;
-        border-radius:15px; padding:20px; text-align:center;">
-            <div style="color:white;font-size:20px;">مستوى الخطورة</div>
-            <div style="color:#00E0A0;font-size:30px;font-weight:bold;">
-                منخفض 🟢
-            </div>
-            <div style="color:white;font-size:21px;">
-                درجة الخطورة: {score} نقطة
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-   
-st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
-
-if st.button("ابدأ الفحص الشامل", use_container_width=True):
-    if message:
-        score = 0
-        reasons = []
-
-        # ضع هنا كود فحص الرسالة الحالي كاملًا
-        # الكلمات المشبوهة والبيانات الحساسة والروابط
-
-        # إعطاء النتيجة ودرجة الخطورة
-        if score >= 6:
-
-            st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
-
-            # ضع هنا بطاقة الخطورة المرتفعة الحالية
-
-            st.write("**أسباب التحذير:**")
-            for reason in reasons:
-                st.write(f"- {reason}")
-
-            # تشغيل صوت الإنذار
-            try:
-                warning_path = Path(__file__).resolve().parent / "warning.mp3"
-
-                if warning_path.exists():
-                    audio_base64 = base64.b64encode(
-                        warning_path.read_bytes()
-                    ).decode("utf-8")
-
-                    components.html(
-                        f"""
-                        <audio autoplay>
-                            <source src="data:audio/mpeg;base64,{audio_base64}"
-                            type="audio/mpeg">
-                        </audio>
-                        """,
-                        height=0
-                    )
-                else:
-                    st.warning("ملف الإنذار warning.mp3 غير موجود.")
-
-            except Exception as e:
-                st.warning(f"تعذر تشغيل الإنذار: {e}")
-
-        elif score >= 3:
-
-            st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
-
-            # ضع هنا بطاقة الخطورة المتوسطة الحالية
-
-            st.write("**أسباب التنبيه:**")
-            for reason in reasons:
-                st.write(f"- {reason}")
-
-            st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
-
-        else:
-
-            st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
-
-            # ضع هنا بطاقة الخطورة المنخفضة الحالية
-
-            st.write(
-                "كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق."
-            )
-
-    else:
-        st.warning("الرجاء إدخال رسالة أولاً.")
