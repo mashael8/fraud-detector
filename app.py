@@ -5,6 +5,7 @@ from audio_recorder_streamlit import audio_recorder
 import speech_recognition as sr
 import io
 import base64
+from pathlib import Path
 
 # إعدادات الصفحة
 st.set_page_config(
@@ -550,16 +551,73 @@ else:
         unsafe_allow_html=True
     )
 
-   st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
+   
+st.write("كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق.")
 
 if st.button("ابدأ الفحص الشامل", use_container_width=True):
     if message:
         score = 0
         reasons = []
 
-        # ضع هنا كود الفحص كاملًا
+        # ضع هنا كود فحص الرسالة الحالي كاملًا
+        # الكلمات المشبوهة والبيانات الحساسة والروابط
 
-        # ضع هنا كود عرض النتائج ومستوى الخطورة
+        # إعطاء النتيجة ودرجة الخطورة
+        if score >= 6:
+
+            st.error("🚨 تحذير! توجد مؤشرات قوية على محاولة احتيال!")
+
+            # ضع هنا بطاقة الخطورة المرتفعة الحالية
+
+            st.write("**أسباب التحذير:**")
+            for reason in reasons:
+                st.write(f"- {reason}")
+
+            # تشغيل صوت الإنذار
+            try:
+                warning_path = Path(__file__).resolve().parent / "warning.mp3"
+
+                if warning_path.exists():
+                    audio_base64 = base64.b64encode(
+                        warning_path.read_bytes()
+                    ).decode("utf-8")
+
+                    components.html(
+                        f"""
+                        <audio autoplay>
+                            <source src="data:audio/mpeg;base64,{audio_base64}"
+                            type="audio/mpeg">
+                        </audio>
+                        """,
+                        height=0
+                    )
+                else:
+                    st.warning("ملف الإنذار warning.mp3 غير موجود.")
+
+            except Exception as e:
+                st.warning(f"تعذر تشغيل الإنذار: {e}")
+
+        elif score >= 3:
+
+            st.warning("⚠️ توجد مؤشرات تستدعي الحذر.")
+
+            # ضع هنا بطاقة الخطورة المتوسطة الحالية
+
+            st.write("**أسباب التنبيه:**")
+            for reason in reasons:
+                st.write(f"- {reason}")
+
+            st.write("لا تضغط على الروابط ولا تشارك بياناتك السرية.")
+
+        else:
+
+            st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+
+            # ضع هنا بطاقة الخطورة المنخفضة الحالية
+
+            st.write(
+                "كن حذرًا دائمًا، ولا تشارك بياناتك الشخصية أو رموز التحقق."
+            )
 
     else:
         st.warning("الرجاء إدخال رسالة أولاً.")
