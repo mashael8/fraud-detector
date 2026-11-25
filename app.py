@@ -6,6 +6,8 @@ import speech_recognition as sr
 import io
 import base64
 from pathlib import Path
+from PIL import Image
+import pytesseract
 
 # إعدادات الصفحة
 st.set_page_config(
@@ -290,8 +292,7 @@ st.markdown(
         font-size:18px;
         margin-bottom:25px;
     ">
-        مرحباً بك في أمان. أدخل الرسالة أو الرابط الذي تريد فحصه،
-        وسنساعدك على اكتشاف مؤشرات الاحتيال.
+        مرحباً بك في أمان. افحص الرسائل والروابط أو ارفع صورة تحتوي على رسالة أو رابط.
     </p>
     """,
     unsafe_allow_html=True
@@ -306,6 +307,7 @@ audio_bytes = audio_recorder(
 )
 
 message = ""
+uploaded_image = None
 
 with tab1:
     # إذا تم تسجيل صوت
@@ -322,7 +324,16 @@ with tab1:
             st.error("عذراً، لم نتمكن من التعرف على الصوت. جرب الكتابة أو أعد التسجيل.")
             message = ""
 
-    # 2. خيار الكتابة
+    # 2. رفع صورة لفحص النصوص والروابط الموجودة بداخلها
+    uploaded_image = st.file_uploader(
+        "أو ارفع صورة رسالة أو إعلان لفحصها",
+        type=["png", "jpg", "jpeg"],
+        accept_multiple_files=False
+    )
+    if uploaded_image is not None:
+        st.image(uploaded_image, caption="الصورة المرفوعة", use_container_width=True)
+
+    # 3. خيار الكتابة
     message_text = st.text_area(
     "الرسالة أو الرابط المراد فحصه",
     value=message,
@@ -331,11 +342,31 @@ with tab1:
 )
     if message_text:
         message = message_text
-    # 3. زر التحليل
+    # 4. زر التحليل
     if st.button("ابدأ الفحص الشامل", use_container_width=True):
-        if message:
+        if message or uploaded_image is not None:
             score = 0
             reasons = []
+
+            # استخراج النص من الصورة (OCR) ثم فحصه مع الرسالة والروابط
+            if uploaded_image is not None:
+                try:
+                    image = Image.open(uploaded_image).convert("RGB")
+                    image_text = pytesseract.image_to_string(image, lang="ara+eng")
+                    if image_text.strip():
+                        message = (message + "\n" + image_text).strip()
+                        st.success("تم استخراج النص من الصورة وإضافته للفحص.")
+                        with st.expander("النص المستخرج من الصورة"):
+                            st.write(image_text)
+                    else:
+                        st.warning("لم يتم العثور على نص واضح داخل الصورة؛ لا يمكن تقييمها اعتمادًا على الصورة وحدها.")
+                        if not message.strip():
+                            st.stop()
+                except Exception as e:
+                    st.error("تعذر قراءة نص الصورة. تأكدي من إعداد OCR ومكتباته.")
+                    st.caption(str(e))
+                    if not message.strip():
+                        st.stop()
 
         
             # فحص الكلمات والعبارات المشبوهة
@@ -516,7 +547,7 @@ with tab1:
 
             else:
 
-                st.success("✅ لم نعثر على مؤشرات احتيال قوية.")
+                st.success("✅ لم نعثر على مؤشرات احتيال قوية في المحتوى المفحوص.")
 
                 st.markdown(
                     f"""
