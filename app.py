@@ -1,3 +1,4 @@
+
 import streamlit as st
 import re
 import io
@@ -27,10 +28,11 @@ st.set_page_config(
 
 
 # ==========================================
-# إعداد Gemini
+# إعداد Gemini والنموذج الاحتياطي
 # ==========================================
 
-GEMINI_MODEL = "gemini-3.8-flash"
+GEMINI_PRIMARY_MODEL = "gemini-3.8-flash"
+GEMINI_BACKUP_MODEL = "gemini-3.6-flash"
 
 MAX_GEMINI_ATTEMPTS = 3
 
@@ -69,8 +71,8 @@ def is_temporary_gemini_error(error):
 def analyze_with_gemini(text_to_check, uploaded_image=None):
     """
     تحليل الرسائل والصور باستخدام Gemini.
-    يعيد نتيجة منظمة بدرجة خطورة وأسباب وتوصيات.
-    يعيد المحاولة تلقائياً عند تعطل الخدمة مؤقتاً.
+    يبدأ بالنموذج الأساسي، ثم ينتقل للاحتياطي
+    إذا استمر عطل الخدمة المؤقت.
     """
 
     client = get_gemini_client()
@@ -78,7 +80,10 @@ def analyze_with_gemini(text_to_check, uploaded_image=None):
     if client is None:
         return {
             "success": False,
-            "error": "مفتاح Gemini غير موجود أو تعذر إنشاء الاتصال. تحققي من Secrets."
+            "error": (
+                "مفتاح Gemini غير موجود أو تعذر إنشاء الاتصال. "
+                "تحققي من Secrets."
+            )
         }
 
     prompt = """
@@ -148,98 +153,122 @@ def analyze_with_gemini(text_to_check, uploaded_image=None):
     if uploaded_image is not None:
         content.append(uploaded_image)
 
-    # إعادة المحاولة عند الأعطال المؤقتة
-    for attempt in range(MAX_GEMINI_ATTEMPTS):
+    # ترتيب النماذج: الأساسي ثم الاحتياطي
+    models_to_try = [
+        GEMINI_PRIMARY_MODEL,
+        GEMINI_BACKUP_MODEL
+    ]
 
-        try:
-            response = client.models.generate_content(
-                model=GEMINI_MODEL,
-                contents=content,
-                config={
-                    "response_mime_type": "application/json"
+    errors = []
+
+    for model_index, model_name in enumerate(models_to_try):
+
+        # إعادة المحاولة لكل نموذج عند الأعطال المؤقتة
+        for attempt in range(MAX_GEMINI_ATTEMPTS):
+
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=content,
+                    config={
+                        "response_mime_type": "application/json"
+                    }
+                )
+
+                result_text = response.text
+
+                if not result_text:
+                    raise ValueError(
+                        "لم يرجع Gemini نتيجة."
+                    )
+
+                result_text = result_text.strip()
+
+                if result_text.startswith("```"):
+                    result_text = re.sub(
+                        r"^```(?:json)?\s*|\s*```$",
+                        "",
+                        result_text
+                    )
+
+                result = json.loads(result_text)
+
+                if not isinstance(result, dict):
+                    raise ValueError(
+                        "استجابة Gemini ليست بصيغة JSON الصحيحة."
+                    )
+
+                score = int(result.get("risk_score", 0))
+                score = max(0, min(100, score))
+
+                reasons = result.get("reasons", [])
+                suspicious_items = result.get(
+                    "suspicious_items", []
+                )
+
+                if not isinstance(reasons, list):
+                    reasons = []
+
+                if not isinstance(suspicious_items, list):
+                    suspicious_items = []
+
+                recommendation = result.get(
+                    "recommendation",
+                    "توخ الحذر قبل التفاعل مع المحتوى."
+                )
+
+                return {
+                    "success": True,
+                    "risk_score": score,
+                    "risk_level": result.get(
+                        "risk_level",
+                        "غير محدد"
+                    ),
+                    "reasons": reasons,
+                    "suspicious_items": suspicious_items,
+                    "recommendation": str(recommendation),
+                    "model_used": model_name
                 }
-            )
 
-            result_text = response.text
+            except Exception as e:
 
-            if not result_text:
-                raise ValueError("لم يرجع Gemini نتيجة.")
-
-            result_text = result_text.strip()
-
-            if result_text.startswith("```"):
-                result_text = re.sub(
-                    r"^```(?:json)?\s*|\s*```$",
-                    "",
-                    result_text
+                error_text = str(e)
+                errors.append(
+                    f"{model_name}: {error_text}"
                 )
 
-            result = json.loads(result_text)
+                # لا ننتقل إلى نموذج آخر إلا عند عطل مؤقت
+                if is_temporary_gemini_error(e):
 
-            if not isinstance(result, dict):
-                raise ValueError(
-                    "استجابة Gemini ليست بصيغة JSON الصحيحة."
-                )
+                    if attempt < MAX_GEMINI_ATTEMPTS - 1:
+                        wait_seconds = 2 ** (attempt + 1)
+                        time.sleep(wait_seconds)
+                        continue
 
-            score = int(result.get("risk_score", 0))
-            score = max(0, min(100, score))
+                    # انتهت محاولات هذا النموذج
+                    break
 
-            reasons = result.get("reasons", [])
-            suspicious_items = result.get(
-                "suspicious_items", []
-            )
-
-            if not isinstance(reasons, list):
-                reasons = []
-
-            if not isinstance(suspicious_items, list):
-                suspicious_items = []
-
-            recommendation = result.get(
-                "recommendation",
-                "توخ الحذر قبل التفاعل مع المحتوى."
-            )
-
-            return {
-                "success": True,
-                "risk_score": score,
-                "risk_level": result.get(
-                    "risk_level",
-                    "غير محدد"
-                ),
-                "reasons": reasons,
-                "suspicious_items": suspicious_items,
-                "recommendation": str(recommendation)
-            }
-
-        except Exception as e:
-
-            # إذا كان العطل مؤقتاً، أعد المحاولة
-            if is_temporary_gemini_error(e):
-
-                if attempt < MAX_GEMINI_ATTEMPTS - 1:
-                    wait_seconds = 2 ** (attempt + 1)
-                    time.sleep(wait_seconds)
-                    continue
-
+                # الأخطاء غير المؤقتة لا تستدعي إعادة المحاولة
                 return {
                     "success": False,
                     "error": (
-                        "خدمة Gemini مشغولة حالياً بعد "
-                        f"{MAX_GEMINI_ATTEMPTS} محاولات. "
-                        "يرجى الانتظار قليلاً ثم إعادة الفحص.\n"
-                        f"تفاصيل الخطأ: {str(e)}"
+                        f"تعذر التحليل باستخدام {model_name}.\n"
+                        f"تفاصيل الخطأ: {error_text}"
                     )
                 }
 
-            return {
-                "success": False,
-                "error": str(e)
-            }
+        # إذا كان النموذج الأساسي قد فشل مؤقتًا،
+        # ننتقل إلى النموذج الاحتياطي
+        if model_index == 0:
+            continue
 
     return {
         "success": False,
-        "error": "تعذر الاتصال بخدمة Gemini."
+        "error": (
+            "تعذر إكمال التحليل باستخدام النموذج الأساسي "
+            "والنموذج الاحتياطي بعد إعادة المحاولة.\n\n"
+            + "\n\n".join(errors)
+        )
     }
 
 
@@ -357,7 +386,7 @@ def local_security_scan(message):
                     "الرابط يحتوي على تركيب قد يُستخدم لإخفاء الوجهة الحقيقية."
                 )
 
-            if domain.startswith("xn--"):
+            if "xn--" in domain:
                 score += 20
                 reasons.append(
                     "النطاق يستخدم ترميزًا قد يخفي تشابه الأحرف."
@@ -802,7 +831,6 @@ with tab1:
         use_container_width=True
     )
 
-
     # ======================================
     # تنفيذ الفحص
     # ======================================
@@ -826,7 +854,7 @@ with tab1:
                     local_security_scan(message)
                 )
 
-                # فحص Gemini
+                # فحص Gemini مع النموذج الاحتياطي
                 ai_result = analyze_with_gemini(
                     message,
                     image_for_gemini
@@ -914,6 +942,11 @@ with tab1:
                 )
 
                 st.write("")
+
+                # إظهار النموذج المستخدم
+                st.caption(
+                    f"تم التحليل باستخدام: {ai_result['model_used']}"
+                )
 
                 # تحليل الذكاء الاصطناعي
                 st.subheader(
