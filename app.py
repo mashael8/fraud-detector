@@ -1,9 +1,9 @@
-
 import streamlit as st
 import re
 import io
 import json
 import base64
+import time
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,20 +32,45 @@ st.set_page_config(
 
 GEMINI_MODEL = "gemini-3.8-flash"
 
+MAX_GEMINI_ATTEMPTS = 3
+
+
 @st.cache_resource
 def get_gemini_client():
-    api_key = st.secrets.get("GEMINI_API_KEY", "")
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY", "")
 
-    if not api_key:
+        if not api_key:
+            return None
+
+        return genai.Client(api_key=api_key)
+
+    except Exception:
         return None
 
-    return genai.Client(api_key=api_key)
+
+def is_temporary_gemini_error(error):
+    error_text = str(error).upper()
+
+    temporary_codes = [
+        "503",
+        "UNAVAILABLE",
+        "500",
+        "INTERNAL",
+        "502",
+        "BAD GATEWAY",
+        "504",
+        "GATEWAY TIMEOUT"
+    ]
+
+    return any(code in error_text for code in temporary_codes)
 
 
 def analyze_with_gemini(text_to_check, uploaded_image=None):
     """
     تحليل الرسائل والصور باستخدام Gemini.
     يعيد نتيجة منظمة بدرجة خطورة وأسباب وتوصيات.
+    يعيد المحاولة تلقائياً عند تعطل الخدمة مؤقتاً.
     """
 
     client = get_gemini_client()
@@ -53,7 +78,7 @@ def analyze_with_gemini(text_to_check, uploaded_image=None):
     if client is None:
         return {
             "success": False,
-            "error": "مفتاح Gemini غير موجود في إعدادات Secrets."
+            "error": "مفتاح Gemini غير موجود أو تعذر إنشاء الاتصال. تحققي من Secrets."
         }
 
     prompt = """
@@ -114,68 +139,108 @@ def analyze_with_gemini(text_to_check, uploaded_image=None):
 
     content = [prompt]
 
-    if text_to_check.strip():
+    if text_to_check and text_to_check.strip():
         content.append(
-            "النص أو الروابط المطلوب تحليلها:\n" + text_to_check[:15000]
+            "النص أو الروابط المطلوب تحليلها:\n"
+            + text_to_check[:15000]
         )
 
     if uploaded_image is not None:
         content.append(uploaded_image)
 
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=content,
-            config={
-                "response_mime_type": "application/json"
-            }
-        )
+    # إعادة المحاولة عند الأعطال المؤقتة
+    for attempt in range(MAX_GEMINI_ATTEMPTS):
 
-        result_text = response.text
-
-        if not result_text:
-            raise ValueError("لم يرجع Gemini نتيجة.")
-
-        result_text = result_text.strip()
-
-        if result_text.startswith("```"):
-            result_text = re.sub(
-                r"^```(?:json)?\s*|\s*```$",
-                "",
-                result_text
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=content,
+                config={
+                    "response_mime_type": "application/json"
+                }
             )
 
-        result = json.loads(result_text)
+            result_text = response.text
 
-        score = int(result.get("risk_score", 0))
-        score = max(0, min(100, score))
+            if not result_text:
+                raise ValueError("لم يرجع Gemini نتيجة.")
 
-        reasons = result.get("reasons", [])
-        suspicious_items = result.get("suspicious_items", [])
+            result_text = result_text.strip()
 
-        if not isinstance(reasons, list):
-            reasons = []
+            if result_text.startswith("```"):
+                result_text = re.sub(
+                    r"^```(?:json)?\s*|\s*```$",
+                    "",
+                    result_text
+                )
 
-        if not isinstance(suspicious_items, list):
-            suspicious_items = []
+            result = json.loads(result_text)
 
-        return {
-            "success": True,
-            "risk_score": score,
-            "risk_level": result.get("risk_level", "غير محدد"),
-            "reasons": reasons,
-            "suspicious_items": suspicious_items,
-            "recommendation": result.get(
+            if not isinstance(result, dict):
+                raise ValueError(
+                    "استجابة Gemini ليست بصيغة JSON الصحيحة."
+                )
+
+            score = int(result.get("risk_score", 0))
+            score = max(0, min(100, score))
+
+            reasons = result.get("reasons", [])
+            suspicious_items = result.get(
+                "suspicious_items", []
+            )
+
+            if not isinstance(reasons, list):
+                reasons = []
+
+            if not isinstance(suspicious_items, list):
+                suspicious_items = []
+
+            recommendation = result.get(
                 "recommendation",
                 "توخ الحذر قبل التفاعل مع المحتوى."
             )
-        }
 
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+            return {
+                "success": True,
+                "risk_score": score,
+                "risk_level": result.get(
+                    "risk_level",
+                    "غير محدد"
+                ),
+                "reasons": reasons,
+                "suspicious_items": suspicious_items,
+                "recommendation": str(recommendation)
+            }
+
+        except Exception as e:
+
+            # إذا كان العطل مؤقتاً، أعد المحاولة
+            if is_temporary_gemini_error(e):
+
+                if attempt < MAX_GEMINI_ATTEMPTS - 1:
+                    wait_seconds = 2 ** (attempt + 1)
+                    time.sleep(wait_seconds)
+                    continue
+
+                return {
+                    "success": False,
+                    "error": (
+                        "خدمة Gemini مشغولة حالياً بعد "
+                        f"{MAX_GEMINI_ATTEMPTS} محاولات. "
+                        "يرجى الانتظار قليلاً ثم إعادة الفحص.\n"
+                        f"تفاصيل الخطأ: {str(e)}"
+                    )
+                }
+
+            return {
+                "success": False,
+                "error": str(e)
+            }
+
+    return {
+        "success": False,
+        "error": "تعذر الاتصال بخدمة Gemini."
+    }
 
 
 # ==========================================
@@ -183,10 +248,11 @@ def analyze_with_gemini(text_to_check, uploaded_image=None):
 # ==========================================
 
 def local_security_scan(message):
+
     score = 0
     reasons = []
 
-    text = message.lower()
+    text = (message or "").lower()
 
     suspicious_words = [
         "جائزة", "جائزه", "فزت", "ربحت", "مبروك",
@@ -216,7 +282,8 @@ def local_security_scan(message):
     if found_words:
         score += 25
         reasons.append(
-            "عبارات تستحق التحقق: " + "، ".join(found_words[:8])
+            "عبارات تستحق التحقق: "
+            + "، ".join(found_words[:8])
         )
 
     sensitive_patterns = [
@@ -233,12 +300,14 @@ def local_security_scan(message):
         for pattern in sensitive_patterns
     ):
         score += 40
-        reasons.append("طلب معلومات سرية أو بيانات بنكية.")
+        reasons.append(
+            "طلب معلومات سرية أو بيانات بنكية."
+        )
 
     # استخراج الروابط
     urls = re.findall(
         r'https?://[^\s<>"\']+|www\.[^\s<>"\']+',
-        message,
+        message or "",
         re.IGNORECASE
     )
 
@@ -253,8 +322,12 @@ def local_security_scan(message):
     ]
 
     for original_url in urls:
+
         url = original_url.rstrip(".,!?،؛)")
-        normalized = url if url.startswith("http") else "https://" + url
+        normalized = (
+            url if url.startswith("http")
+            else "https://" + url
+        )
 
         try:
             parsed = urlparse(normalized)
@@ -290,7 +363,10 @@ def local_security_scan(message):
                     "النطاق يستخدم ترميزًا قد يخفي تشابه الأحرف."
                 )
 
-            if re.fullmatch(r"\d{1,3}(?:\.\d{1,3}){3}", domain):
+            if re.fullmatch(
+                r"\d{1,3}(?:\.\d{1,3}){3}",
+                domain
+            ):
                 score += 20
                 reasons.append(
                     "الرابط يستخدم عنوان IP بدل اسم نطاق معتاد."
@@ -298,7 +374,9 @@ def local_security_scan(message):
 
         except Exception:
             score += 10
-            reasons.append("تعذر تحليل أحد الروابط.")
+            reasons.append(
+                "تعذر تحليل أحد الروابط."
+            )
 
     if urls:
         reasons.append(
@@ -447,7 +525,10 @@ html, body, [class*="css"] {
 </style>
 """
 
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+st.markdown(
+    hide_streamlit_style,
+    unsafe_allow_html=True
+)
 
 
 # ==========================================
@@ -476,11 +557,15 @@ if not st.session_state.logged_in:
         st.title("إنشاء حساب جديد")
         st.write("أنشئ حسابك للانضمام إلى أمان")
 
-        new_email = st.text_input("البريد الإلكتروني الجديد")
+        new_email = st.text_input(
+            "البريد الإلكتروني الجديد"
+        )
+
         new_password = st.text_input(
             "كلمة المرور الجديدة",
             type="password"
         )
+
         confirm_password = st.text_input(
             "تأكيد كلمة المرور",
             type="password"
@@ -488,20 +573,34 @@ if not st.session_state.logged_in:
 
         if st.button("إنشاء الحساب"):
 
-            if not new_email or not new_password or not confirm_password:
-                st.warning("الرجاء تعبئة جميع الحقول")
+            if (
+                not new_email
+                or not new_password
+                or not confirm_password
+            ):
+                st.warning(
+                    "الرجاء تعبئة جميع الحقول"
+                )
 
             elif new_password != confirm_password:
-                st.error("كلمتا المرور غير متطابقتين")
+                st.error(
+                    "كلمتا المرور غير متطابقتين"
+                )
 
             elif new_email in st.session_state.users:
-                st.error("هذا البريد مسجل مسبقاً")
+                st.error(
+                    "هذا البريد مسجل مسبقاً"
+                )
 
             else:
                 st.session_state.users[new_email] = new_password
                 st.session_state.logged_in = True
                 st.session_state.show_signup = False
-                st.success("تم إنشاء حسابك بنجاح!")
+
+                st.success(
+                    "تم إنشاء حسابك بنجاح!"
+                )
+
                 st.rerun()
 
         if st.button("العودة إلى تسجيل الدخول"):
@@ -513,8 +612,13 @@ if not st.session_state.logged_in:
         st.title("تسجيل الدخول إلى أمان")
         st.write("مرحباً بك، سجّل الدخول للمتابعة")
 
-        email = st.text_input("البريد الإلكتروني")
-        show_password = st.checkbox("إظهار كلمة المرور")
+        email = st.text_input(
+            "البريد الإلكتروني"
+        )
+
+        show_password = st.checkbox(
+            "إظهار كلمة المرور"
+        )
 
         password = st.text_input(
             "كلمة المرور",
@@ -531,7 +635,9 @@ if not st.session_state.logged_in:
                 st.rerun()
 
             else:
-                st.error("البريد الإلكتروني أو كلمة المرور غير صحيحة")
+                st.error(
+                    "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+                )
 
         st.write("ليس لديك حساب؟")
 
@@ -549,6 +655,7 @@ if not st.session_state.logged_in:
 col1, col2 = st.columns([5, 1])
 
 with col2:
+
     if st.button("تسجيل الخروج"):
         st.session_state.logged_in = False
         st.session_state.show_signup = False
@@ -618,7 +725,10 @@ with tab1:
         r = sr.Recognizer()
 
         try:
-            with sr.AudioFile(io.BytesIO(audio_bytes)) as source:
+            with sr.AudioFile(
+                io.BytesIO(audio_bytes)
+            ) as source:
+
                 audio_data = r.record(source)
 
             text_from_audio = r.recognize_google(
@@ -626,7 +736,10 @@ with tab1:
                 language="ar-SA"
             )
 
-            st.success("تم تحويل الصوت إلى نص.")
+            st.success(
+                "تم تحويل الصوت إلى نص."
+            )
+
             message = text_from_audio
 
         except Exception:
@@ -652,8 +765,9 @@ with tab1:
                 io.BytesIO(image_bytes)
             ).convert("RGB")
 
-            # تقليل حجم الصورة عند الحاجة
-            image_for_gemini.thumbnail((2000, 2000))
+            image_for_gemini.thumbnail(
+                (2000, 2000)
+            )
 
             st.image(
                 image_for_gemini,
@@ -662,7 +776,10 @@ with tab1:
             )
 
         except Exception:
-            st.error("تعذرت قراءة الصورة. يرجى تجربة صورة أخرى.")
+            st.error(
+                "تعذرت قراءة الصورة. يرجى تجربة صورة أخرى."
+            )
+
             image_for_gemini = None
 
     # كتابة الرسالة أو الرابط
@@ -694,7 +811,9 @@ with tab1:
 
         if not message.strip() and image_for_gemini is None:
 
-            st.warning("الرجاء إدخال رسالة أو رابط أو رفع صورة.")
+            st.warning(
+                "الرجاء إدخال رسالة أو رابط أو رفع صورة."
+            )
 
         else:
 
@@ -713,17 +832,21 @@ with tab1:
                     image_for_gemini
                 )
 
+            # لا نعتمد الفحص المحلي وحده
             if not ai_result["success"]:
 
-                st.error("تعذر إكمال تحليل Gemini.")
-
-                st.caption(
-                    "تفاصيل الخطأ: " + ai_result["error"]
+                st.error(
+                    "تعذر إكمال تحليل Gemini."
                 )
 
                 st.warning(
-                    "لم يتم اعتماد الفحص المحلي وحده كنتيجة نهائية؛ "
-                    "تحققي من اتصال Gemini ومفتاح API."
+                    ai_result["error"]
+                )
+
+                st.info(
+                    "لم يتم إصدار نتيجة نهائية؛ "
+                    "لأن تحليل الذكاء الاصطناعي لم يكتمل. "
+                    "يمكنك إعادة المحاولة بعد قليل."
                 )
 
             else:
@@ -736,7 +859,10 @@ with tab1:
                     local_score
                 )
 
-                final_score = min(final_score, 100)
+                final_score = min(
+                    final_score,
+                    100
+                )
 
                 if final_score >= 65:
                     level = "مرتفع"
@@ -789,16 +915,27 @@ with tab1:
 
                 st.write("")
 
-                # أسباب Gemini
-                st.subheader("تحليل الذكاء الاصطناعي")
+                # تحليل الذكاء الاصطناعي
+                st.subheader(
+                    "تحليل الذكاء الاصطناعي"
+                )
 
-                for reason in ai_result["reasons"]:
-                    st.write("• " + str(reason))
+                if ai_result["reasons"]:
+
+                    for reason in ai_result["reasons"]:
+                        st.write("• " + str(reason))
+
+                else:
+                    st.write(
+                        "لم يحدد Gemini مؤشرات إضافية واضحة."
+                    )
 
                 # مؤشرات محلية
                 if local_reasons:
 
-                    st.subheader("مؤشرات الفحص المحلي")
+                    st.subheader(
+                        "مؤشرات الفحص المحلي"
+                    )
 
                     for reason in local_reasons:
                         st.write("• " + str(reason))
@@ -806,7 +943,9 @@ with tab1:
                 # العناصر المشبوهة
                 if ai_result["suspicious_items"]:
 
-                    st.subheader("العناصر التي تستحق الانتباه")
+                    st.subheader(
+                        "العناصر التي تستحق الانتباه"
+                    )
 
                     for item in ai_result["suspicious_items"]:
                         st.write("⚠️ " + str(item))
@@ -814,15 +953,21 @@ with tab1:
                 # الروابط المكتشفة
                 if found_urls:
 
-                    st.subheader("الروابط المكتشفة")
+                    st.subheader(
+                        "الروابط المكتشفة"
+                    )
 
                     for url in found_urls:
                         st.code(url)
 
                 # التوصية
-                st.subheader("توصية أمان")
+                st.subheader(
+                    "توصية أمان"
+                )
 
-                st.info(ai_result["recommendation"])
+                st.info(
+                    ai_result["recommendation"]
+                )
 
                 # الإنذار عند الخطورة المرتفعة
                 if final_score >= 65:
@@ -862,7 +1007,9 @@ with tab1:
                             )
 
                     except Exception as e:
-                        st.warning(f"تعذر تشغيل الإنذار: {e}")
+                        st.warning(
+                            f"تعذر تشغيل الإنذار: {e}"
+                        )
 
                 elif final_score >= 35:
 
