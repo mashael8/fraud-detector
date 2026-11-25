@@ -3,3 +3,4 @@ SpeechRecognition
 audio-recorder-streamlit
 Pillow
 pytesseract
+google-genai
