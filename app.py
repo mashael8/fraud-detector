@@ -192,18 +192,65 @@ if "users" not in st.session_state:
 
 if not st.session_state.logged_in:
 
-    st.markdown(
-        """
-        <style>
+    
+st.markdown(
+    """
+    <style>
+    /* التنسيق الأساسي */
+    .block-container {
+        max-width: 850px !important;
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* تحسين العرض على الجوال */
+    @media screen and (max-width: 768px) {
+
         .block-container {
-            max-width: 850px !important;
-            padding-top: 2rem !important;
-            padding-bottom: 2rem !important;
+            padding: 1rem 0.8rem !important;
+            max-width: 100% !important;
         }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+
+        h1 {
+            font-size: 27px !important;
+            line-height: 1.5 !important;
+        }
+
+        h2, h3 {
+            font-size: 22px !important;
+        }
+
+        p, label, .stMarkdown {
+            font-size: 16px !important;
+        }
+
+        .stTextInput input,
+        .stTextArea textarea {
+            width: 100% !important;
+            font-size: 16px !important;
+        }
+
+        .stButton > button {
+            width: 100% !important;
+            min-height: 50px !important;
+            font-size: 16px !important;
+        }
+
+        [data-testid="stImage"] img {
+            max-width: 120px !important;
+            height: auto !important;
+        }
+
+        [data-testid="column"] {
+            width: 100% !important;
+            flex: 1 1 100% !important;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 
     logo_col1, logo_col2, logo_col3 = st.columns([1, 2, 1])
 
