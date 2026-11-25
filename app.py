@@ -30,11 +30,7 @@ st.set_page_config(
 # إعداد Gemini
 # ==========================================
 
-GEMINI_MODEL = st.secrets.get(
-    "GEMINI_MODEL",
-    "gemini-2.5-flash"
-)
-
+GEMINI_MODEL = "gemini-3.8-flash"
 
 @st.cache_resource
 def get_gemini_client():
